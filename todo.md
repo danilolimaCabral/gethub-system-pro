@@ -166,3 +166,19 @@
 - [x] Classificação de custos (Fixo/Variável)
 - [x] Cards com KPIs financeiros
 - [ ] Testar todos os módulos financeiros
+
+## Base de Dados de Teste em Massa
+- [x] Criar script de seed com centenas de registros
+- [x] Gerar dados realistas com datas variadas (últimos 6 meses)
+- [x] Executar seed em massa (604 registros)
+- [x] Validar dados no sistema
+
+## Dashboard CEO
+- [x] Implementar gráficos com Recharts
+- [x] KPIs principais (Receita, Despesas, Lucro, Saldo)
+- [x] Gráfico de evolução de caixa
+- [x] Gráfico de recebíveis vs pagáveis
+- [x] Análise por categorias
+- [x] Alertas críticos
+- [x] Burn rate e runway
+- [x] Visão executiva consolidada

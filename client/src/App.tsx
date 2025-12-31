@@ -18,9 +18,6 @@ import Marketplaces from "./pages/Marketplaces";
 import Suppliers from "./pages/Suppliers";
 import Customers from "./pages/Customers";
 import Products from "./pages/Products";
-import CashFlow from "./pages/CashFlow";
-import Receivables from "./pages/Receivables";
-import Payables from "./pages/Payables";
 import Stock from "./pages/Stock";
 import Settings from "./pages/Settings";
 
