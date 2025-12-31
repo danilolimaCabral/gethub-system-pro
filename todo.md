@@ -154,3 +154,15 @@
 - [x] Validação de formulários
 - [x] Feedback de sucesso/erro
 - [x] Testar todos os CRUDs
+
+## Módulos Financeiros Funcionais
+- [x] Interface de CashFlow com formulário de lançamento
+- [x] Cálculo automático de saldo em CashFlow
+- [x] Interface de Receivables com filtros por período
+- [x] Cálculo de dias em atraso em Receivables
+- [x] Projeções D+7, D+15, D+30 em Receivables
+- [x] Interface de Payables com status
+- [x] Alertas de vencimento em Payables
+- [x] Classificação de custos (Fixo/Variável)
+- [x] Cards com KPIs financeiros
+- [ ] Testar todos os módulos financeiros
