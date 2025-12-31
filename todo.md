@@ -206,3 +206,30 @@
 - [x] Testar login e navegação entre páginas
 - [x] Verificar que usuário permanece autenticado
 - [x] Sistema JWT completo e funcional
+
+## Sistema de Permissões por Módulo
+- [ ] Criar enum de permissões no schema
+- [ ] Adicionar campo permissions na tabela users
+- [ ] Implementar middleware de verificação de permissões
+- [ ] Atualizar routers para verificar permissões
+- [ ] Ocultar módulos no frontend baseado em permissões
+- [ ] Admin vê todos os módulos
+- [ ] Usuário comum vê apenas módulos permitidos
+
+## Exportação de Relatórios
+- [x] Instalar bibliotecas xlsx e jsPDF
+- [x] Criar helper de exportação para Excel
+- [x] Criar helper de exportação para PDF
+- [x] Adicionar botão de exportar em CashFlow
+- [x] Adicionar botão de exportar em Receivables
+- [x] Adicionar botão de exportar em Payables
+- [x] Sistema pronto para exportar dados financeiros
+- [x] Formato simples igual planilha
+
+## Simplificação para Venda Comercial
+- [ ] Simplificar interface para uso intuitivo
+- [ ] Adicionar tour guiado para novos usuários
+- [ ] Criar documentação de uso
+- [ ] Adicionar vídeos tutoriais (links)
+- [ ] Preparar material de venda
+- [ ] Criar página de landing page
