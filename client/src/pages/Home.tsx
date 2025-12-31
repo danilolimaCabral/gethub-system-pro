@@ -1,4 +1,4 @@
-import { useAuth } from "@/_core/hooks/useAuth";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -9,10 +9,11 @@ import { trpc } from "@/lib/trpc";
 import { Building2, LayoutDashboard, Plus, TrendingUp } from "lucide-react";
 import { useState } from "react";
 import { useLocation } from "wouter";
+import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
 export default function Home() {
-  const { user, loading, isAuthenticated } = useAuth();
+  const { user, loading, isAuthenticated, logout } = useAuth();
   const [, setLocation] = useLocation();
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
@@ -47,6 +48,16 @@ export default function Home() {
     localStorage.setItem("selectedTenantId", tenantId.toString());
     setLocation("/dashboard");
   };
+
+  const handleLogout = () => {
+    logout();
+    setLocation("/login");
+  };
+
+  if (!isAuthenticated && !loading) {
+    setLocation("/login");
+    return null;
+  }
 
   if (loading) {
     return (

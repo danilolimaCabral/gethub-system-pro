@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { trpc } from "@/lib/trpc";
+import { useAuth } from "@/contexts/AuthContext";
 import { Building2, Loader2 } from "lucide-react";
 
 export default function Register() {
@@ -16,18 +16,7 @@ export default function Register() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const registerMutation = trpc.auth.register.useMutation({
-    onSuccess: (data) => {
-      // Salvar token no localStorage
-      localStorage.setItem("auth_token", data.token);
-      toast.success("Conta criada com sucesso!");
-      setLocation("/");
-    },
-    onError: (error) => {
-      toast.error(error.message || "Erro ao criar conta");
-      setIsLoading(false);
-    },
-  });
+  const { register: registerUser } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,7 +37,15 @@ export default function Register() {
     }
 
     setIsLoading(true);
-    registerMutation.mutate({ email, password, name });
+    try {
+      await registerUser(email, password, name);
+      toast.success("Conta criada com sucesso!");
+      setLocation("/");
+    } catch (error: any) {
+      toast.error(error.message || "Erro ao criar conta");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

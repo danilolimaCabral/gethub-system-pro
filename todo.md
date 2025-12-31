@@ -116,3 +116,12 @@
 - [x] Testes automatizados
 - [x] Dados de teste (seed)
 - [x] Documentação README
+
+## Autenticação Independente (Pronto para Cliente)
+- [x] Remover dependências de OAuth Manus
+- [x] Simplificar contexto de autenticação
+- [x] Criar página de login funcional
+- [x] Criar página de registro funcional
+- [x] Implementar proteção de rotas
+- [x] Testar fluxo completo de login/logout
+- [x] Sistema independente e pronto para venda

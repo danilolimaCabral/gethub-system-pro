@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { trpc } from "@/lib/trpc";
+import { useAuth } from "@/contexts/AuthContext";
 import { Building2, Loader2 } from "lucide-react";
 
 export default function Login() {
@@ -14,18 +14,7 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const loginMutation = trpc.auth.login.useMutation({
-    onSuccess: (data) => {
-      // Salvar token no localStorage
-      localStorage.setItem("auth_token", data.token);
-      toast.success("Login realizado com sucesso!");
-      setLocation("/");
-    },
-    onError: (error) => {
-      toast.error(error.message || "Erro ao fazer login");
-      setIsLoading(false);
-    },
-  });
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +25,15 @@ export default function Login() {
     }
 
     setIsLoading(true);
-    loginMutation.mutate({ email, password });
+    try {
+      await login(email, password);
+      toast.success("Login realizado com sucesso!");
+      setLocation("/");
+    } catch (error: any) {
+      toast.error(error.message || "Erro ao fazer login");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
