@@ -36,92 +36,60 @@ export async function getDb() {
 
 // ==================== USER MANAGEMENT ====================
 
-export async function upsertUser(user: InsertUser): Promise<void> {
-  if (!user.openId) {
-    throw new Error("User openId is required for upsert");
+export async function createUser(user: InsertUser): Promise<number> {
+  if (!user.email || !user.password) {
+    throw new Error("Email and password are required");
   }
 
   const db = await getDb();
   if (!db) {
-    console.warn("[Database] Cannot upsert user: database not available");
-    return;
+    throw new Error("Database not available");
   }
 
   try {
-    const values: InsertUser = {
-      openId: user.openId,
-    };
-    const updateSet: Record<string, unknown> = {};
-
-    const textFields = ["name", "email", "loginMethod"] as const;
-    type TextField = (typeof textFields)[number];
-
-    const assignNullable = (field: TextField) => {
-      const value = user[field];
-      if (value === undefined) return;
-      const normalized = value ?? null;
-      values[field] = normalized;
-      updateSet[field] = normalized;
-    };
-
-    textFields.forEach(assignNullable);
-
-    if (user.lastSignedIn !== undefined) {
-      values.lastSignedIn = user.lastSignedIn;
-      updateSet.lastSignedIn = user.lastSignedIn;
-    }
-    if (user.role !== undefined) {
-      values.role = user.role;
-      updateSet.role = user.role;
-    } else if (user.openId === ENV.ownerOpenId) {
-      values.role = 'admin';
-      updateSet.role = 'admin';
-    }
-
-    if (!values.lastSignedIn) {
-      values.lastSignedIn = new Date();
-    }
-
-    if (Object.keys(updateSet).length === 0) {
-      updateSet.lastSignedIn = new Date();
-    }
-
-    await db.insert(users).values(values).onDuplicateKeyUpdate({
-      set: updateSet,
-    });
+    const result = await db.insert(users).values(user);
+    return Number(result[0].insertId);
   } catch (error) {
-    console.error("[Database] Failed to upsert user:", error);
+    console.error("[Database] Failed to create user:", error);
     throw error;
   }
 }
-
-export async function getUserByOpenId(openId: string) {
+export async function getUserByEmail(email: string) {
   const db = await getDb();
   if (!db) {
     console.warn("[Database] Cannot get user: database not available");
     return undefined;
   }
 
-  const result = await db.select().from(users).where(eq(users.openId, openId)).limit(1);
+  const result = await db.select().from(users).where(eq(users.email, email)).limit(1);
   return result.length > 0 ? result[0] : undefined;
 }
 
 export async function getUserById(id: number) {
   const db = await getDb();
-  if (!db) return undefined;
-  
+  if (!db) {
+    return undefined;
+  }
+
   const result = await db.select().from(users).where(eq(users.id, id)).limit(1);
   return result.length > 0 ? result[0] : undefined;
 }
 
+export async function updateUserLastSignIn(userId: number) {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.update(users).set({ lastSignedIn: new Date() }).where(eq(users.id, userId));
+}
+
 // ==================== TENANT MANAGEMENT ====================
 
-export async function createTenant(data: InsertTenant) {
+export async function createTenant(data: InsertTenant): Promise<number> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
   const result = await db.insert(tenants).values(data);
-  return result;
+  return Number(result[0].insertId);
 }
 
 export async function getTenantById(id: number) {
@@ -166,6 +134,10 @@ export async function addUserToTenant(data: InsertTenantUser) {
   
   await db.insert(tenantUsers).values(data);
 }
+
+// Alias para compatibilidade
+export const createTenantUser = addUserToTenant;
+export const listUserTenants = getUserTenants;
 
 export async function getUserTenantRole(userId: number, tenantId: number) {
   const db = await getDb();
@@ -356,6 +328,8 @@ export async function getProducts(tenantId: number) {
   
   return await db.select().from(products).where(eq(products.tenantId, tenantId)).orderBy(asc(products.name));
 }
+
+export const listProducts = getProducts;
 
 export async function getProductById(id: number, tenantId: number) {
   const db = await getDb();
@@ -607,3 +581,71 @@ export async function updateImportLog(id: number, data: Partial<InsertImportLog>
   
   await db.update(importLogs).set(data).where(eq(importLogs.id, id));
 }
+
+// ==================== DASHBOARD ====================
+
+export async function getDashboardSummary(tenantId: number) {
+  const db = await getDb();
+  if (!db) return {
+    totalCashFlow: "0",
+    totalReceivables: "0",
+    totalPayables: "0",
+    netProjection: "0",
+    overdueReceivables: 0,
+    overduePayables: 0,
+  };
+
+  // Buscar último fluxo de caixa
+  const cashFlowResult = await db.select()
+    .from(cashFlow)
+    .where(eq(cashFlow.tenantId, tenantId))
+    .orderBy(desc(cashFlow.date))
+    .limit(1);
+  
+  const latestCashFlow = cashFlowResult.length > 0 ? cashFlowResult[0] : null;
+
+  // Buscar recebíveis
+  const receivablesResult = await db.select()
+    .from(receivables)
+    .where(and(
+      eq(receivables.tenantId, tenantId),
+      eq(receivables.status, "Previsto")
+    ));
+
+  // Buscar pagáveis
+  const payablesResult = await db.select()
+    .from(payables)
+    .where(and(
+      eq(payables.tenantId, tenantId),
+      eq(payables.status, "Aberto")
+    ));
+
+  // Calcular totais
+  const totalReceivables = receivablesResult.reduce((sum, r) => sum + parseFloat(r.amount), 0);
+  const totalPayables = payablesResult.reduce((sum, p) => sum + parseFloat(p.amount), 0);
+  const netProjection = totalReceivables - totalPayables;
+
+  // Contar atrasados
+  const now = new Date();
+  const overdueReceivables = receivablesResult.filter(r => new Date(r.expectedDate) < now).length;
+  const overduePayables = payablesResult.filter(p => new Date(p.dueDate) < now).length;
+
+  return {
+    totalCashFlow: latestCashFlow?.closingBalance || "0",
+    totalReceivables: totalReceivables.toFixed(2),
+    totalPayables: totalPayables.toFixed(2),
+    netProjection: netProjection.toFixed(2),
+    overdueReceivables,
+    overduePayables,
+  };
+}
+
+// Aliases para compatibilidade com routers
+export const listCustomers = getCustomers;
+export const listCashFlow = getCashFlowByDateRange;
+export const listReceivables = getReceivables;
+export const listPayables = getPayables;
+export const listCompanies = getCompanies;
+export const listCategories = getCategories;
+export const listMarketplaces = getMarketplaces;
+export const listSuppliers = getSuppliers;
