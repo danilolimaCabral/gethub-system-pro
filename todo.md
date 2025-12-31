@@ -182,3 +182,9 @@
 - [x] Alertas críticos
 - [x] Burn rate e runway
 - [x] Visão executiva consolidada
+
+## Remover Autenticação OAuth Manus
+- [x] Desabilitar rotas de OAuth no servidor
+- [x] Sistema configurado para usar apenas JWT local
+- [x] Testar login local sem OAuth
+- [x] Verificar funcionamento completo
