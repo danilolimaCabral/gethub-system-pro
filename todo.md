@@ -125,3 +125,13 @@
 - [x] Implementar proteção de rotas
 - [x] Testar fluxo completo de login/logout
 - [x] Sistema independente e pronto para venda
+
+## Interface de Importação de Planilhas
+- [x] Criar página de importação com upload
+- [x] Implementar preview de dados do Excel
+- [x] Adicionar mapeamento de colunas
+- [x] Implementar validação de dados
+- [x] Criar confirmação de importação
+- [x] Adicionar feedback de progresso
+- [x] Implementar log de importações
+- [x] Testar importação completa
