@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
 import { Building2, LayoutDashboard, Plus, TrendingUp, Upload } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -54,10 +54,12 @@ export default function Home() {
     setLocation("/login");
   };
 
-  if (!isAuthenticated && !loading) {
-    setLocation("/login");
-    return null;
-  }
+  // Redirecionar para login se não autenticado (usando useEffect para evitar loop)
+  useEffect(() => {
+    if (!isAuthenticated && !loading) {
+      setLocation("/login");
+    }
+  }, [isAuthenticated, loading, setLocation]);
 
   if (loading) {
     return (

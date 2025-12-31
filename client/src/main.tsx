@@ -44,9 +44,17 @@ const trpcClient = trpc.createClient({
       url: "/api/trpc",
       transformer: superjson,
       fetch(input, init) {
+        // Adicionar token JWT no header Authorization
+        const token = localStorage.getItem('token');
+        const headers = {
+          ...(init?.headers || {}),
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        };
+        
         return globalThis.fetch(input, {
           ...(init ?? {}),
           credentials: "include",
+          headers,
         });
       },
     }),

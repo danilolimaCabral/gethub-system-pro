@@ -195,3 +195,14 @@
 - [x] Configurar para ir direto ao login local
 - [x] Testar acesso sem OAuth
 - [x] Verificar funcionamento completo - Sistema vai direto ao login local
+
+## Correção de Persistência de Sessão
+- [x] Investigar problema de sessão JWT não persistindo
+- [x] Corrigir armazenamento de token no localStorage
+- [x] Garantir que AuthContext mantenha sessão
+- [x] Corrigir redirecionamento no Home.tsx usando useEffect
+- [x] Substituir SDK Manus por validação JWT no context.ts
+- [x] Adicionar header Authorization em todas as requisições tRPC
+- [x] Testar login e navegação entre páginas
+- [x] Verificar que usuário permanece autenticado
+- [x] Sistema JWT completo e funcional
