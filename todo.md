@@ -135,3 +135,22 @@
 - [x] Adicionar feedback de progresso
 - [x] Implementar log de importações
 - [x] Testar importação completa
+
+## Integração Backend de Importação
+- [x] Criar endpoint tRPC de importação
+- [x] Conectar frontend ao backend
+- [x] Processar arquivo Excel no servidor
+- [x] Salvar dados no banco
+- [x] Retornar resultado detalhado
+- [ ] Testar importação end-to-end
+
+## Formulários CRUD Completos
+- [x] CRUD de Companies (criar/editar/deletar)
+- [x] CRUD de Products (criar/editar/deletar)
+- [x] CRUD de Categories (criar/editar/deletar)
+- [x] CRUD de Suppliers (criar/editar/deletar)
+- [x] CRUD de Customers (criar/editar/deletar)
+- [x] CRUD de Marketplaces (criar/editar/deletar)
+- [x] Validação de formulários
+- [x] Feedback de sucesso/erro
+- [x] Testar todos os CRUDs

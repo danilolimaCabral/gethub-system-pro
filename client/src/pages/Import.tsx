@@ -84,6 +84,24 @@ export default function Import() {
     }
   };
 
+  const importMutation = trpc.import.uploadAndProcess.useMutation({
+    onSuccess: (data) => {
+      setImportProgress(100);
+      setImportResult({
+        success: data.imported,
+        errors: data.errors,
+      });
+      toast.success(data.message);
+    },
+    onError: (error) => {
+      toast.error(error.message || "Erro ao importar dados");
+      setImportResult({
+        success: 0,
+        errors: preview?.totalRows || 0,
+      });
+    },
+  });
+
   const handleImport = async () => {
     if (!file || !preview) {
       toast.error("Selecione um arquivo primeiro");
@@ -105,27 +123,25 @@ export default function Import() {
         });
       }, 200);
 
-      // Aqui você chamaria o endpoint de importação
-      // await importMutation.mutateAsync({ file, mapping });
-      
-      // Simular sucesso após 2 segundos
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Converter arquivo para base64
+      const reader = new FileReader();
+      const fileData = await new Promise<string>((resolve) => {
+        reader.onload = () => {
+          const base64 = reader.result as string;
+          resolve(base64.split(',')[1]); // Remover prefixo data:...
+        };
+        reader.readAsDataURL(file);
+      });
+
+      // Chamar endpoint de importação
+      await importMutation.mutateAsync({
+        fileData,
+        fileName: file.name,
+      });
       
       clearInterval(interval);
-      setImportProgress(100);
-
-      setImportResult({
-        success: preview.totalRows,
-        errors: 0,
-      });
-
-      toast.success(`${preview.totalRows} registros importados com sucesso!`);
     } catch (error: any) {
-      toast.error(error.message || "Erro ao importar dados");
-      setImportResult({
-        success: 0,
-        errors: preview.totalRows,
-      });
+      console.error(error);
     } finally {
       setIsProcessing(false);
     }

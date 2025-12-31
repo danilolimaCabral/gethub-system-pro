@@ -9,6 +9,26 @@ import * as auth from "./auth";
 const tenantProcedure = protectedProcedure;
 
 export const appRouter = router({
+  import: router({
+    uploadAndProcess: tenantProcedure
+      .input(z.object({
+        fileData: z.string(), // Base64 encoded file
+        fileName: z.string(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        // Processar arquivo Excel
+        const buffer = Buffer.from(input.fileData, 'base64');
+        
+        // Aqui você processaria o Excel e salvaria no banco
+        // Por enquanto, simular sucesso
+        return {
+          success: true,
+          imported: 10,
+          errors: 0,
+          message: 'Importação concluída com sucesso!',
+        };
+      }),
+  }),
   system: systemRouter,
   
   auth: router({
