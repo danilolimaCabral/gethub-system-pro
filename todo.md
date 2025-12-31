@@ -188,3 +188,10 @@
 - [x] Sistema configurado para usar apenas JWT local
 - [x] Testar login local sem OAuth
 - [x] Verificar funcionamento completo
+
+## Remover Tela de OAuth do Frontend
+- [x] Identificar onde está a verificação de OAuth no frontend
+- [x] Remover redirecionamento para tela Manus
+- [x] Configurar para ir direto ao login local
+- [x] Testar acesso sem OAuth
+- [x] Verificar funcionamento completo - Sistema vai direto ao login local
