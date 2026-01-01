@@ -25,6 +25,7 @@ import DRE from "./pages/DRE";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import { Tutorial } from "./components/Tutorial";
+import { usePWA } from "./hooks/usePWA";
 
 function Router() {
   return (
@@ -59,6 +60,9 @@ function Router() {
 }
 
 function App() {
+  // Registrar PWA
+  usePWA();
+
   return (
     <ErrorBoundary>
       <ThemeProvider defaultTheme="dark">
