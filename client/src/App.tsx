@@ -5,7 +5,7 @@ import Import from "./pages/Import";
 import CashFlow from "./pages/CashFlow";
 import Receivables from "./pages/Receivables";
 import Payables from "./pages/Payables";
-import { Route, Switch } from "wouter";
+import { Route, Switch, Redirect } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
@@ -34,7 +34,7 @@ function Router() {
       <Route path="/register" component={Register} />
       <Route path="/forgot-password" component={ForgotPassword} />
       <Route path="/reset-password/:token" component={ResetPassword} />
-      <Route path="/" component={() => { setLocation('/dashboard'); return null; }} />
+      <Route path="/"><Redirect to="/dashboard" /></Route>
       <Route path="/import" component={Import} />
       <Route path="/cashflow" component={CashFlow} />
       <Route path="/receivables" component={Receivables} />
