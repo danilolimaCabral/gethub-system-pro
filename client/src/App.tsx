@@ -11,7 +11,7 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import Dashboard from "./pages/Dashboard";
+import Dashboard from './pages/Dashboard';
 import Companies from "./pages/Companies";
 import Categories from "./pages/Categories";
 import Marketplaces from "./pages/Marketplaces";

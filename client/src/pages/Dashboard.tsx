@@ -10,12 +10,13 @@ import { format, subMonths, startOfMonth, endOfMonth, eachMonthOfInterval } from
 import { ptBR } from "date-fns/locale";
 
 export default function Dashboard() {
+  const { data: kpis, isLoading: loadingKPIs } = trpc.dashboard.getKPIs.useQuery({});
   const { data: cashFlowData, isLoading: loadingCash } = trpc.cashFlow.list.useQuery({});
   const { data: receivablesData, isLoading: loadingReceivables } = trpc.receivable.list.useQuery({});
   const { data: payablesData, isLoading: loadingPayables } = trpc.payable.list.useQuery({});
   const { data: categories } = trpc.category.list.useQuery({});
 
-  const isLoading = loadingCash || loadingReceivables || loadingPayables;
+  const isLoading = loadingKPIs || loadingCash || loadingReceivables || loadingPayables;
 
   if (isLoading) {
     return (
@@ -25,24 +26,23 @@ export default function Dashboard() {
     );
   }
 
-  // Cálculos de KPIs
-  const totalEntradas = cashFlowData?.filter(c => c.type === "ENTRADA").reduce((acc, c) => acc + parseFloat(c.amount), 0) || 0;
-  const totalSaidas = cashFlowData?.filter(c => c.type === "SAÍDA").reduce((acc, c) => acc + parseFloat(c.amount), 0) || 0;
-  const saldoAtual = totalEntradas - totalSaidas;
-  const lucro = totalEntradas - totalSaidas;
-
-  const totalRecebiveis = receivablesData?.reduce((acc, r) => acc + parseFloat(r.amount), 0) || 0;
-  const recebiveisAtrasados = receivablesData?.filter(r => r.status === "ATRASADO").reduce((acc, r) => acc + parseFloat(r.amount), 0) || 0;
+  // Usar KPIs calculados no backend
+  const totalEntradas = kpis?.totalEntradas || 0;
+  const totalSaidas = kpis?.totalSaidas || 0;
+  const saldoAtual = kpis?.saldoAtual || 0;
+  const lucro = kpis?.lucro || 0;
+  const totalRecebiveis = kpis?.totalRecebiveis || 0;
+  const totalPagaveis = kpis?.totalPagaveis || 0;
   
-  const totalPagaveis = payablesData?.reduce((acc, p) => acc + parseFloat(p.amount), 0) || 0;
+  const recebiveisAtrasados = receivablesData?.filter(r => r.status === "ATRASADO").reduce((acc, r) => acc + parseFloat(r.amount), 0) || 0;
   const pagaveisVencidos = payablesData?.filter(p => p.status === "VENCIDO").reduce((acc, p) => acc + parseFloat(p.amount), 0) || 0;
 
   // Burn Rate (últimos 30 dias)
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
   const saidasUltimos30Dias = cashFlowData?.filter(c => 
-    c.type === "SAÍDA" && new Date(c.date) >= thirtyDaysAgo
-  ).reduce((acc, c) => acc + parseFloat(c.amount), 0) || 0;
+    new Date(c.date) >= thirtyDaysAgo
+  ).reduce((acc, c) => acc + parseFloat(c.outflow || '0'), 0) || 0;
   const burnRate = saidasUltimos30Dias / 30;
 
   // Runway (meses)
@@ -60,16 +60,14 @@ export default function Dashboard() {
     const monthEnd = endOfMonth(month);
     
     const entradas = cashFlowData?.filter(c => 
-      c.type === "ENTRADA" && 
       new Date(c.date) >= monthStart && 
       new Date(c.date) <= monthEnd
-    ).reduce((acc, c) => acc + parseFloat(c.amount), 0) || 0;
+    ).reduce((acc, c) => acc + parseFloat(c.inflow || '0'), 0) || 0;
 
     const saidas = cashFlowData?.filter(c => 
-      c.type === "SAÍDA" && 
       new Date(c.date) >= monthStart && 
       new Date(c.date) <= monthEnd
-    ).reduce((acc, c) => acc + parseFloat(c.amount), 0) || 0;
+    ).reduce((acc, c) => acc + parseFloat(c.outflow || '0'), 0) || 0;
 
     return {
       mes: format(month, "MMM/yy", { locale: ptBR }),
@@ -80,14 +78,9 @@ export default function Dashboard() {
   });
 
   // Dados para gráfico de categorias
-  const categoryData = categories?.map(cat => {
-    const total = cashFlowData?.filter(c => c.categoryId === cat.id)
-      .reduce((acc, c) => acc + parseFloat(c.amount), 0) || 0;
-    return {
-      name: cat.name,
-      value: Math.round(total)
-    };
-  }).filter(c => c.value > 0).sort((a, b) => b.value - a.value).slice(0, 8) || [];
+  // NOTA: cashFlow não tem categoryId, pois é um resumo diário
+  // TODO: Implementar agrupamento por categorias usando receivables/payables
+  const categoryData: { name: string; value: number }[] = [];
 
   // Dados para gráfico de recebíveis vs pagáveis
   const compareData = [

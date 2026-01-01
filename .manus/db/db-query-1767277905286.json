@@ -1,0 +1,87 @@
+{
+  "query": "SELECT id, name, slug, ownerId, active FROM tenants;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2q7zpKXyHy6d6eT.3361d9972713 --database PRmoFLsahKdkvgxbSxCWaH --execute SELECT id, name, slug, ownerId, active FROM tenants;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "Empresa Demonstração",
+      "slug": "demo",
+      "ownerId": "1",
+      "active": "1"
+    },
+    {
+      "id": "2",
+      "name": "Test Tenant",
+      "slug": "test-tenant-1767200644169",
+      "ownerId": "1",
+      "active": "1"
+    },
+    {
+      "id": "3",
+      "name": "First Tenant",
+      "slug": "duplicate-1767200644538",
+      "ownerId": "1",
+      "active": "1"
+    },
+    {
+      "id": "4",
+      "name": "Test Tenant",
+      "slug": "test-tenant-1767200665985",
+      "ownerId": "1",
+      "active": "1"
+    },
+    {
+      "id": "5",
+      "name": "First Tenant",
+      "slug": "duplicate-1767200666335",
+      "ownerId": "1",
+      "active": "1"
+    },
+    {
+      "id": "6",
+      "name": "Danilo com",
+      "slug": "tec-rec",
+      "ownerId": "6",
+      "active": "1"
+    },
+    {
+      "id": "30001",
+      "name": "Empresa Teste",
+      "slug": "empresa-teste",
+      "ownerId": "1",
+      "active": "1"
+    },
+    {
+      "id": "60002",
+      "name": "Test Tenant DRE",
+      "slug": "test-dre-1767268736467",
+      "ownerId": "60001",
+      "active": "1"
+    },
+    {
+      "id": "60003",
+      "name": "Test Tenant Permissions",
+      "slug": "test-perm-1767268736482",
+      "ownerId": "60002",
+      "active": "1"
+    },
+    {
+      "id": "60004",
+      "name": "Test Tenant",
+      "slug": "test-tenant-1767268736493",
+      "ownerId": "1",
+      "active": "1"
+    },
+    {
+      "id": "60005",
+      "name": "First Tenant",
+      "slug": "duplicate-1767268736530",
+      "ownerId": "1",
+      "active": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tslug\townerId\tactive\n1\tEmpresa Demonstração\tdemo\t1\t1\n2\tTest Tenant\ttest-tenant-1767200644169\t1\t1\n3\tFirst Tenant\tduplicate-1767200644538\t1\t1\n4\tTest Tenant\ttest-tenant-1767200665985\t1\t1\n5\tFirst Tenant\tduplicate-1767200666335\t1\t1\n6\tDanilo com\ttec-rec\t6\t1\n30001\tEmpresa Teste\tempresa-teste\t1\t1\n60002\tTest Tenant DRE\ttest-dre-1767268736467\t60001\t1\n60003\tTest Tenant Permissions\ttest-perm-1767268736482\t60002\t1\n60004\tTest Tenant\ttest-tenant-1767268736493\t1\t1\n60005\tFirst Tenant\tduplicate-1767268736530\t1\t1\n",
+  "stderr": "",
+  "execution_time_ms": 56
+}

@@ -370,9 +370,10 @@ export const appRouter = router({
 
   category: router({
     list: tenantProcedure
-      .input(z.object({ tenantId: z.number() }))
-      .query(async ({ input }) => {
-        return db.listCategories(input.tenantId);
+      .input(z.object({}).optional())
+      .query(async ({ ctx }) => {
+        if (!ctx.tenantId) throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Tenant not found' });
+        return db.listCategories(ctx.tenantId);
       }),
 
     create: tenantProcedure
@@ -479,6 +480,33 @@ export const appRouter = router({
       }),
   }),
 
+  dashboard: router({
+    getKPIs: tenantProcedure
+      .input(z.object({}).optional())
+      .query(async ({ ctx }) => {
+        if (!ctx.tenantId) throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Tenant not found' });
+        
+        const cashFlowData = await db.listCashFlow(ctx.tenantId, new Date(Date.now() - 180 * 24 * 60 * 60 * 1000), new Date());
+        const receivablesData = await db.listReceivables(ctx.tenantId);
+        const payablesData = await db.listPayables(ctx.tenantId);
+        
+        const totalEntradas = cashFlowData.reduce((acc, c) => acc + parseFloat(c.inflow || '0'), 0);
+        const totalSaidas = cashFlowData.reduce((acc, c) => acc + parseFloat(c.outflow || '0'), 0);
+        const totalRecebiveis = receivablesData.reduce((acc, r) => acc + parseFloat(r.amount), 0);
+        const totalPagaveis = payablesData.reduce((acc, p) => acc + parseFloat(p.amount), 0);
+        
+        return {
+          totalEntradas,
+          totalSaidas,
+          lucro: totalEntradas - totalSaidas,
+          saldoAtual: totalEntradas - totalSaidas,
+          totalRecebiveis,
+          totalPagaveis,
+          margemLucro: totalEntradas > 0 ? ((totalEntradas - totalSaidas) / totalEntradas) * 100 : 0,
+        };
+      }),
+  }),
+
   cashFlow: router({
     list: tenantProcedure
       .input(z.object({ 
@@ -487,12 +515,10 @@ export const appRouter = router({
       }))
       .query(async ({ input, ctx }) => {
         if (!ctx.tenantId) {
-          throw new TRPCError({
-            code: "FORBIDDEN",
-            message: "Usuário não associado a nenhuma empresa",
-          });
+          throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Tenant not found' });
         }
-        const start = input.startDate || new Date(Date.now() - 90 * 24 * 60 * 60 * 1000);
+
+        const start = input.startDate || new Date(Date.now() - 180 * 24 * 60 * 60 * 1000);
         const end = input.endDate || new Date();
         return db.listCashFlow(ctx.tenantId, start, end);
       }),
@@ -516,9 +542,10 @@ export const appRouter = router({
 
   receivable: router({
     list: tenantProcedure
-      .input(z.object({ tenantId: z.number() }))
-      .query(async ({ input }) => {
-        return db.listReceivables(input.tenantId);
+      .input(z.object({}).optional())
+      .query(async ({ ctx }) => {
+        if (!ctx.tenantId) throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Tenant not found' });
+        return db.listReceivables(ctx.tenantId);
       }),
 
     create: tenantProcedure
@@ -543,9 +570,10 @@ export const appRouter = router({
 
   payable: router({
     list: tenantProcedure
-      .input(z.object({ tenantId: z.number() }))
-      .query(async ({ input }) => {
-        return db.listPayables(input.tenantId);
+      .input(z.object({}).optional())
+      .query(async ({ ctx }) => {
+        if (!ctx.tenantId) throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Tenant not found' });
+        return db.listPayables(ctx.tenantId);
       }),
 
     create: tenantProcedure
@@ -570,13 +598,6 @@ export const appRouter = router({
       }),
   }),
 
-  dashboard: router({
-    summary: tenantProcedure
-      .input(z.object({ tenantId: z.number() }))
-      .query(async ({ input }) => {
-        return db.getDashboardSummary(input.tenantId);
-      }),
-  }),
 });
 
 export type AppRouter = typeof appRouter;

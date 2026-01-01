@@ -1,0 +1,16 @@
+{
+  "query": "SELECT c.tenantId, COUNT(DISTINCT c.id) as cash_count, COUNT(DISTINCT r.id) as receivables_count, COUNT(DISTINCT p.id) as payables_count FROM cash_flow c LEFT JOIN receivables r ON c.tenantId = r.tenantId LEFT JOIN payables p ON c.tenantId = p.tenantId GROUP BY c.tenantId ORDER BY cash_count DESC LIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2q7zpKXyHy6d6eT.3361d9972713 --database PRmoFLsahKdkvgxbSxCWaH --execute SELECT c.tenantId, COUNT(DISTINCT c.id) as cash_count, COUNT(DISTINCT r.id) as receivables_count, COUNT(DISTINCT p.id) as payables_count FROM cash_flow c LEFT JOIN receivables r ON c.tenantId = r.tenantId LEFT JOIN payables p ON c.tenantId = p.tenantId GROUP BY c.tenantId ORDER BY cash_count DESC LIMIT 1;",
+  "rows": [
+    {
+      "tenantId": "1",
+      "cash_count": "153",
+      "receivables_count": "22",
+      "payables_count": "22"
+    }
+  ],
+  "messages": [],
+  "stdout": "tenantId\tcash_count\treceivables_count\tpayables_count\n1\t153\t22\t22\n",
+  "stderr": "",
+  "execution_time_ms": 116
+}

@@ -1,0 +1,15 @@
+{
+  "query": "SELECT COUNT(*) as total, SUM(inflow) as total_inflow, SUM(outflow) as total_outflow FROM cash_flow WHERE tenantId = 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2q7zpKXyHy6d6eT.3361d9972713 --database PRmoFLsahKdkvgxbSxCWaH --execute SELECT COUNT(*) as total, SUM(inflow) as total_inflow, SUM(outflow) as total_outflow FROM cash_flow WHERE tenantId = 1;",
+  "rows": [
+    {
+      "total": "153",
+      "total_inflow": "4038855.33",
+      "total_outflow": "1855220.41"
+    }
+  ],
+  "messages": [],
+  "stdout": "total\ttotal_inflow\ttotal_outflow\n153\t4038855.33\t1855220.41\n",
+  "stderr": "",
+  "execution_time_ms": 57
+}

@@ -1,0 +1,9 @@
+{
+  "query": "SELECT tu.*, u.email FROM tenant_users tu JOIN users u ON tu.userId = u.id WHERE u.email = 'admin@erpfinanceiro.com';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2q7zpKXyHy6d6eT.3361d9972713 --database PRmoFLsahKdkvgxbSxCWaH --execute SELECT tu.*, u.email FROM tenant_users tu JOIN users u ON tu.userId = u.id WHERE u.email = 'admin@erpfinanceiro.com';",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 92
+}

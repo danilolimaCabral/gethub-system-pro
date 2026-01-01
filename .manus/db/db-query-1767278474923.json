@@ -1,0 +1,23 @@
+{
+  "query": "SELECT * FROM cash_flow WHERE tenantId = 1 LIMIT 1",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2q7zpKXyHy6d6eT.3361d9972713 --database PRmoFLsahKdkvgxbSxCWaH --execute SELECT * FROM cash_flow WHERE tenantId = 1 LIMIT 1",
+  "rows": [
+    {
+      "id": "30001",
+      "tenantId": "1",
+      "date": "2025-07-01 04:00:00",
+      "openingBalance": "401000.00",
+      "inflow": "32418.39",
+      "outflow": "13230.70",
+      "closingBalance": "420187.69",
+      "variation": "4.78",
+      "notes": "Movimentação do dia 01/07/2025",
+      "createdAt": "2026-01-01 14:11:25",
+      "updatedAt": "2026-01-01 14:11:25"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttenantId\tdate\topeningBalance\tinflow\toutflow\tclosingBalance\tvariation\tnotes\tcreatedAt\tupdatedAt\n30001\t1\t2025-07-01 04:00:00\t401000.00\t32418.39\t13230.70\t420187.69\t4.78\tMovimentação do dia 01/07/2025\t2026-01-01 14:11:25\t2026-01-01 14:11:25\n",
+  "stderr": "",
+  "execution_time_ms": 101
+}

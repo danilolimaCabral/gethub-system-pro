@@ -1,0 +1,14 @@
+{
+  "query": "SELECT id, email FROM users WHERE email = 'admin@erpfinanceiro.com';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2q7zpKXyHy6d6eT.3361d9972713 --database PRmoFLsahKdkvgxbSxCWaH --execute SELECT id, email FROM users WHERE email = 'admin@erpfinanceiro.com';",
+  "rows": [
+    {
+      "id": "30001",
+      "email": "admin@erpfinanceiro.com"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\temail\n30001\tadmin@erpfinanceiro.com\n",
+  "stderr": "",
+  "execution_time_ms": 58
+}

@@ -1,0 +1,8 @@
+{
+  "query": "INSERT INTO tenant_users (tenantId, userId, role, createdAt, updatedAt) SELECT 1, id, 'admin', NOW(), NOW() FROM users WHERE email = 'admin@erpfinanceiro.com' AND NOT EXISTS (SELECT 1 FROM tenant_users WHERE userId = (SELECT id FROM users WHERE email = 'admin@erpfinanceiro.com'));",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2q7zpKXyHy6d6eT.3361d9972713 --database PRmoFLsahKdkvgxbSxCWaH --execute INSERT INTO tenant_users (tenantId, userId, role, createdAt, updatedAt) SELECT 1, id, 'admin', NOW(), NOW() FROM users WHERE email = 'admin@erpfinanceiro.com' AND NOT EXISTS (SELECT 1 FROM tenant_users WHERE userId = (SELECT id FROM users WHERE email = 'admin@erpfinanceiro.com'));",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'updatedAt' in 'field list'"
+  ]
+}

@@ -432,3 +432,15 @@
 - [ ] Verificar se dre.test.ts passa (8 testes - skipped)
 - [ ] Verificar se permissions.test.ts passa (10 testes - skipped)
 - [ ] Corrigir testes que falharem (system.test.ts com 13 falhas)
+
+## Correção de Dashboard CEO - Dados Zerados
+- [x] Investigar problema de valores zerados no Dashboard
+- [x] Identificar que dados existem no banco mas não aparecem
+- [x] Corrigir associação de tenant do usuário admin
+- [x] Criar endpoint dashboard.getKPIs para cálculos no backend
+- [x] Modificar Dashboard para usar novo endpoint
+- [x] Remover router dashboard duplicado
+- [x] Corrigir endpoints receivable.list, payable.list e category.list para usar ctx.tenantId
+- [x] Limpar logs de debug
+- [x] Testar Dashboard com dados reais
+- [x] Dashboard CEO agora mostra valores corretos (R$ 3.895.529,41 receita, R$ 1.792.931,54 despesas)
