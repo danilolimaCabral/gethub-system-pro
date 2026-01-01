@@ -92,10 +92,11 @@
 - [ ] Margem de Lucro
 
 ### **PROBLEMA IDENTIFICADO:**
-- [ ] Investigar por que Receita/Despesas mostram R$ 0,00
-- [ ] Verificar queries no backend
-- [ ] Validar tenantId nas queries
-- [ ] Corrigir cálculos
+- [x] Investigar por que Receita/Despesas mostram R$ 0,00
+- [x] Verificar queries no backend (tenantId adicionado ao context)
+- [x] Validar tenantId nas queries (getTenantByUserId implementado)
+- [ ] Corrigir endpoint cashFlow.list (30 registros no banco mas não retorna)
+- [ ] Testar Dashboard após correção
 
 ---
 

@@ -10,10 +10,10 @@ import { format, subMonths, startOfMonth, endOfMonth, eachMonthOfInterval } from
 import { ptBR } from "date-fns/locale";
 
 export default function Dashboard() {
-  const { data: cashFlowData, isLoading: loadingCash } = trpc.cashFlow.list.useQuery({ tenantId: 1 });
-  const { data: receivablesData, isLoading: loadingReceivables } = trpc.receivable.list.useQuery({ tenantId: 1 });
-  const { data: payablesData, isLoading: loadingPayables } = trpc.payable.list.useQuery({ tenantId: 1 });
-  const { data: categories } = trpc.category.list.useQuery({ tenantId: 1 });
+  const { data: cashFlowData, isLoading: loadingCash } = trpc.cashFlow.list.useQuery({});
+  const { data: receivablesData, isLoading: loadingReceivables } = trpc.receivable.list.useQuery({});
+  const { data: payablesData, isLoading: loadingPayables } = trpc.payable.list.useQuery({});
+  const { data: categories } = trpc.category.list.useQuery({});
 
   const isLoading = loadingCash || loadingReceivables || loadingPayables;
 

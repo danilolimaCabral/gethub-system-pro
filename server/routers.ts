@@ -5,7 +5,7 @@ import { TRPCError } from "@trpc/server";
 import * as db from "./db";
 import * as auth from "./auth";
 
-// Middleware para validar tenant - simplificado para testes
+// Middleware para validar tenant - simplificado
 const tenantProcedure = protectedProcedure;
 
 export const appRouter = router({
@@ -482,14 +482,19 @@ export const appRouter = router({
   cashFlow: router({
     list: tenantProcedure
       .input(z.object({ 
-        tenantId: z.number(),
         startDate: z.date().optional(),
         endDate: z.date().optional(),
       }))
-      .query(async ({ input }) => {
+      .query(async ({ input, ctx }) => {
+        if (!ctx.tenantId) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Usuário não associado a nenhuma empresa",
+          });
+        }
         const start = input.startDate || new Date(Date.now() - 90 * 24 * 60 * 60 * 1000);
         const end = input.endDate || new Date();
-        return db.listCashFlow(input.tenantId, start, end);
+        return db.listCashFlow(ctx.tenantId, start, end);
       }),
 
     create: tenantProcedure
