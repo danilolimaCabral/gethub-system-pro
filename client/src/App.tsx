@@ -22,6 +22,8 @@ import Stock from "./pages/Stock";
 import Settings from "./pages/Settings";
 import Users from "./pages/Users";
 import DRE from "./pages/DRE";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import { Tutorial } from "./components/Tutorial";
 
 function Router() {
@@ -29,6 +31,8 @@ function Router() {
     <Switch>
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />
+      <Route path="/forgot-password" component={ForgotPassword} />
+      <Route path="/reset-password/:token" component={ResetPassword} />
       <Route path={"/"} component={Home} />
       <Route path="/import" component={Import} />
       <Route path="/cashflow" component={CashFlow} />

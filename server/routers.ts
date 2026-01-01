@@ -1,5 +1,5 @@
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
-import { systemRouter } from "./_core/systemRouter";
+import { notifyOwner } from './_core/notification';
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import * as db from "./db";
@@ -29,7 +29,6 @@ export const appRouter = router({
         };
       }),
   }),
-  system: systemRouter,
   
   auth: router({
     me: publicProcedure.query(({ ctx }) => ctx.user),
@@ -81,6 +80,54 @@ export const appRouter = router({
       }
       return { success: true };
     }),
+    
+    requestPasswordReset: publicProcedure
+      .input(z.object({
+        email: z.string().email(),
+      }))
+      .mutation(async ({ input }) => {
+        const user = await db.getUserByEmail(input.email);
+        
+        if (!user) {
+          // Não revelar se o email existe ou não (segurança)
+          return { success: true };
+        }
+        
+        // Gerar token de reset
+        const token = await auth.createPasswordResetToken(user.id);
+        
+        // Enviar notificação ao owner com o link de reset
+        const resetLink = `${process.env.VITE_APP_URL || 'http://localhost:3000'}/reset-password/${token}`;
+        
+        try {
+          await notifyOwner({
+            title: 'Solicitação de Recuperação de Senha',
+            content: `Usuário ${user.email} solicitou recuperação de senha.\n\nLink de reset: ${resetLink}\n\nO link expira em 1 hora.`,
+          });
+        } catch (error) {
+          console.error('Erro ao enviar notificação:', error);
+        }
+        
+        return { success: true };
+      }),
+    
+    resetPassword: publicProcedure
+      .input(z.object({
+        token: z.string(),
+        newPassword: z.string().min(6),
+      }))
+      .mutation(async ({ input }) => {
+        const success = await auth.resetPassword(input.token, input.newPassword);
+        
+        if (!success) {
+          throw new TRPCError({ 
+            code: 'BAD_REQUEST', 
+            message: 'Token inválido ou expirado' 
+          });
+        }
+        
+        return { success: true };
+      }),
   }),
 
   user: router({

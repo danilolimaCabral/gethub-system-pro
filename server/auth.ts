@@ -122,3 +122,91 @@ export async function updatePassword(userId: number, currentPassword: string, ne
 
   return true;
 }
+
+
+// ==================== PASSWORD RESET ====================
+
+import crypto from 'crypto';
+
+export function generateResetToken(): string {
+  return crypto.randomBytes(32).toString('hex');
+}
+
+export async function createPasswordResetToken(userId: number): Promise<string> {
+  const token = generateResetToken();
+  const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hora
+  
+  const database = await db.getDb();
+  if (!database) {
+    throw new Error('Database not available');
+  }
+  
+  await database.insert(db.passwordResetTokens).values({
+    userId,
+    token,
+    expiresAt,
+    used: false,
+  });
+  
+  return token;
+}
+
+export async function validateResetToken(token: string): Promise<number | null> {
+  const database = await db.getDb();
+  if (!database) {
+    return null;
+  }
+  
+  const [resetToken] = await database
+    .select()
+    .from(db.passwordResetTokens)
+    .where(db.eq(db.passwordResetTokens.token, token))
+    .limit(1);
+  
+  if (!resetToken) {
+    return null;
+  }
+  
+  // Verificar se já foi usado
+  if (resetToken.used) {
+    return null;
+  }
+  
+  // Verificar se expirou
+  if (new Date() > new Date(resetToken.expiresAt)) {
+    return null;
+  }
+  
+  return resetToken.userId;
+}
+
+export async function markTokenAsUsed(token: string): Promise<void> {
+  const database = await db.getDb();
+  if (!database) {
+    throw new Error('Database not available');
+  }
+  
+  await database
+    .update(db.passwordResetTokens)
+    .set({ used: true })
+    .where(db.eq(db.passwordResetTokens.token, token));
+}
+
+export async function resetPassword(token: string, newPassword: string): Promise<boolean> {
+  const userId = await validateResetToken(token);
+  
+  if (!userId) {
+    return false;
+  }
+  
+  // Hash da nova senha
+  const hashedPassword = await hashPassword(newPassword);
+  
+  // Atualizar senha
+  await db.updateUserPassword(userId, hashedPassword);
+  
+  // Marcar token como usado
+  await markTokenAsUsed(token);
+  
+  return true;
+}

@@ -16,7 +16,8 @@ import {
   marketplaceBalances, InsertMarketplaceBalance,
   stockMovements, InsertStockMovement,
   systemParameters, InsertSystemParameter,
-  importLogs, InsertImportLog
+  importLogs, InsertImportLog,
+  passwordResetTokens
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -797,3 +798,8 @@ export async function getDREComparative(tenantId: number, year: number) {
 
   return months;
 }
+
+
+// Export tables and functions for use in other modules
+export { eq, and, or, desc, asc, gte, lte, sql };
+export { passwordResetTokens };

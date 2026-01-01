@@ -76,6 +76,15 @@ export default function Login() {
                 disabled={isLoading}
               />
             </div>
+            <div className="flex justify-end mb-4">
+              <button
+                type="button"
+                onClick={() => setLocation("/forgot-password")}
+                className="text-sm text-blue-500 hover:text-blue-400"
+              >
+                Esqueci minha senha
+              </button>
+            </div>
             <Button
               type="submit"
               className="w-full bg-blue-600 hover:bg-blue-700"

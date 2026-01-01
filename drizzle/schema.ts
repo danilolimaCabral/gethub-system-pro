@@ -359,3 +359,17 @@ export const alertHistory = mysqlTable("alert_history", {
   alertIdx: index("alert_idx").on(table.alertId),
   triggeredAtIdx: index("triggered_at_idx").on(table.triggeredAt),
 }));
+
+// ==================== PASSWORD RESET ====================
+
+export const passwordResetTokens = mysqlTable("password_reset_tokens", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  token: varchar("token", { length: 255 }).notNull().unique(),
+  expiresAt: timestamp("expiresAt").notNull(),
+  used: boolean("used").default(false).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  userIdx: index("user_idx").on(table.userId),
+  tokenIdx: index("token_idx").on(table.token),
+}));
