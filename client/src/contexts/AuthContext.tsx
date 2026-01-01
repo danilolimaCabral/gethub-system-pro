@@ -4,8 +4,9 @@ import { trpc } from "@/lib/trpc";
 interface User {
   id: number;
   email: string;
-  name?: string;
+  name?: string | null;
   role: string;
+  permissions?: string[];
 }
 
 interface AuthContextType {
@@ -13,8 +14,9 @@ interface AuthContextType {
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, name?: string) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
   isAuthenticated: boolean;
+  refetch: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -22,60 +24,52 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [token, setToken] = useState<string | null>(null);
 
-  // Carregar token do localStorage ao iniciar
+  // Usar trpc.auth.me para verificar autenticação via cookies
+  const { data: userData, isLoading, refetch } = trpc.auth.me.useQuery(undefined, {
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+
   useEffect(() => {
-    const savedToken = localStorage.getItem("auth_token");
-    if (savedToken) {
-      setToken(savedToken);
-      // Verificar token com backend
-      fetchUserData(savedToken);
-    } else {
+    if (!isLoading) {
+      if (userData) {
+        setUser(userData as User);
+      } else {
+        setUser(null);
+      }
       setLoading(false);
     }
-  }, []);
-
-  const fetchUserData = async (authToken: string) => {
-    try {
-      // Aqui você pode adicionar uma chamada para verificar o token
-      // Por enquanto, vamos decodificar o JWT básico
-      const payload = JSON.parse(atob(authToken.split('.')[1]));
-      setUser({
-        id: payload.userId,
-        email: payload.email,
-        name: payload.name,
-        role: payload.role || 'user',
-      });
-    } catch (error) {
-      console.error("Erro ao carregar usuário:", error);
-      localStorage.removeItem("auth_token");
-      setToken(null);
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [userData, isLoading]);
 
   const loginMutation = trpc.auth.login.useMutation({
     onSuccess: (data) => {
-      localStorage.setItem("auth_token", data.token);
-      setToken(data.token);
-      setUser(data.user);
+      setUser(data.user as User);
       setLoading(false);
+      refetch();
     },
     onError: (error) => {
+      setLoading(false);
       throw error;
     },
   });
 
   const registerMutation = trpc.auth.register.useMutation({
     onSuccess: (data) => {
-      localStorage.setItem("auth_token", data.token);
-      setToken(data.token);
-      fetchUserData(data.token);
+      setUser(data.user as User);
+      setLoading(false);
+      refetch();
     },
     onError: (error) => {
+      setLoading(false);
       throw error;
+    },
+  });
+
+  const logoutMutation = trpc.auth.logout.useMutation({
+    onSuccess: () => {
+      setUser(null);
+      refetch();
     },
   });
 
@@ -89,10 +83,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await registerMutation.mutateAsync({ email, password, name });
   };
 
-  const logout = () => {
-    localStorage.removeItem("auth_token");
-    setToken(null);
-    setUser(null);
+  const logout = async () => {
+    await logoutMutation.mutateAsync();
   };
 
   return (
@@ -104,6 +96,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         register,
         logout,
         isAuthenticated: !!user,
+        refetch,
       }}
     >
       {children}

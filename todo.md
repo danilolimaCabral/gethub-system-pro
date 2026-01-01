@@ -381,3 +381,26 @@
 - [ ] Implementar envio de notificação para owner quando alerta disparar
 - [ ] Criar função de verificação periódica de alertas
 - [ ] Adicionar badge de alertas no menu lateral
+
+## Correções Prioritárias
+
+### Problema de Autenticação
+- [x] Investigar logs do servidor para identificar erro de login
+- [x] Verificar console do navegador para erros JavaScript
+- [x] Revisar lógica de autenticação no backend
+- [x] Testar login com diferentes credenciais
+- [x] Corrigir problema de campos sendo limpos (AuthContext corrigido para usar cookies)
+
+### Erros TypeScript
+- [ ] Adicionar função getUserByOpenId no server/db.ts
+- [ ] Adicionar função upsertUser no server/db.ts
+- [ ] Verificar imports/exports em server/db.ts
+- [ ] Executar tsc para validar correções
+- [ ] Garantir que todos os erros foram resolvidos
+
+### Testes Vitest
+- [x] Criar server/auth.test.ts (login, logout, updateProfile, updatePassword)
+- [x] Criar server/dre.test.ts (getMonthly, getComparative, exportExcel, exportPDF)
+- [x] Criar server/permissions.test.ts (listAll, updatePermissions, getPermissions)
+- [ ] Executar pnpm test para validar todos os testes
+- [ ] Garantir cobertura mínima de 80%
