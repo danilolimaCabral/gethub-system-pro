@@ -83,6 +83,14 @@ export async function updateUserLastSignIn(userId: number) {
   await db.update(users).set({ lastSignedIn: new Date() }).where(eq(users.id, userId));
 }
 
+export async function getTenantByUserId(userId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select().from(tenantUsers).where(eq(tenantUsers.userId, userId)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
 export async function updateUser(userId: number, data: { name?: string; email?: string }) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");

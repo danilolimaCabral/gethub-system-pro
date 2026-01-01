@@ -1,0 +1,16 @@
+{
+  "query": "SELECT u.id, u.email, u.role, tu.tenantId FROM users u LEFT JOIN tenant_users tu ON u.id = tu.userId WHERE u.email = 'admin@erpfinanceiro.com' LIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2q7zpKXyHy6d6eT.3361d9972713 --database PRmoFLsahKdkvgxbSxCWaH --execute SELECT u.id, u.email, u.role, tu.tenantId FROM users u LEFT JOIN tenant_users tu ON u.id = tu.userId WHERE u.email = 'admin@erpfinanceiro.com' LIMIT 1;",
+  "rows": [
+    {
+      "id": "30001",
+      "email": "admin@erpfinanceiro.com",
+      "role": "admin",
+      "tenantId": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\temail\trole\ttenantId\n30001\tadmin@erpfinanceiro.com\tadmin\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 67
+}
