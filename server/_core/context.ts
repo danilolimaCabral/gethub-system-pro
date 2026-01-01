@@ -1,10 +1,20 @@
 import type { CreateExpressContextOptions } from "@trpc/server/adapters/express";
 import type { User } from "../../drizzle/schema";
-import { validateToken } from "../auth";
+import * as db from "../db";
+import type { Request, Response } from "express";
+import 'express-session';
+
+declare module 'express-session' {
+  interface SessionData {
+    userId?: number;
+    email?: string;
+    role?: string;
+  }
+}
 
 export type TrpcContext = {
-  req: CreateExpressContextOptions["req"];
-  res: CreateExpressContextOptions["res"];
+  req: Request;
+  res: Response;
   user: User | null;
 };
 
@@ -14,11 +24,10 @@ export async function createContext(
   let user: User | null = null;
 
   try {
-    // Extrair token do header Authorization
-    const authHeader = opts.req.headers.authorization;
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      const token = authHeader.substring(7);
-      user = await validateToken(token);
+    // Verificar se existe sessão ativa
+    const session = (opts.req as any).session;
+    if (session && session.userId) {
+      user = await db.getUserById(session.userId);
     }
   } catch (error) {
     // Authentication is optional for public procedures.
@@ -26,8 +35,8 @@ export async function createContext(
   }
 
   return {
-    req: opts.req,
-    res: opts.res,
+    req: opts.req as Request,
+    res: opts.res as Response,
     user,
   };
 }

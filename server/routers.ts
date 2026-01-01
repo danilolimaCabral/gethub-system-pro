@@ -40,9 +40,20 @@ export const appRouter = router({
         password: z.string().min(6),
         name: z.string().optional(),
       }))
-      .mutation(async ({ input }) => {
-        const { userId, token } = await auth.registerUser(input.email, input.password, input.name);
-        return { success: true, userId, token };
+      .mutation(async ({ input, ctx }) => {
+        const { userId } = await auth.registerUser(input.email, input.password, input.name);
+        const user = await db.getUserById(userId);
+        if (!user) {
+          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Failed to create user' });
+        }
+        
+        // Criar sessão
+        const session = (ctx.req as any).session;
+        session.userId = user.id;
+        session.email = user.email;
+        session.role = user.role;
+        
+        return { user };
       }),
     
     login: publicProcedure
@@ -50,12 +61,24 @@ export const appRouter = router({
         email: z.string().email(),
         password: z.string(),
       }))
-      .mutation(async ({ input }) => {
-        const { user, token } = await auth.loginUser(input.email, input.password);
-        return { success: true, user, token };
+      .mutation(async ({ input, ctx }) => {
+        const { user } = await auth.loginUser(input.email, input.password);
+        
+        // Criar sessão
+        const session = (ctx.req as any).session;
+        session.userId = user.id;
+        session.email = user.email;
+        session.role = user.role;
+        
+        return { user };
       }),
     
-    logout: publicProcedure.mutation(() => {
+    logout: publicProcedure.mutation(({ ctx }) => {
+      // Destruir sessão
+      const session = (ctx.req as any).session;
+      if (session) {
+        session.destroy(() => {});
+      }
       return { success: true };
     }),
   }),

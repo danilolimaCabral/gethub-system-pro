@@ -404,3 +404,31 @@
 - [x] Criar server/permissions.test.ts (listAll, updatePermissions, getPermissions)
 - [ ] Executar pnpm test para validar todos os testes
 - [ ] Garantir cobertura mínima de 80%
+
+## Depuração e Correção de Login (Prioridade Máxima)
+
+### Investigação
+- [x] Verificar logs do servidor em tempo real durante tentativa de login
+- [x] Verificar console do navegador (F12) para erros JavaScript
+- [x] Verificar aba Network para ver requisições tRPC
+- [x] Adicionar console.log no AuthContext para debug
+- [x] Verificar se endpoint auth.login está respondendo
+- [x] **Causa identificada:** Endpoints retornavam `{success, user, token}` mas AuthContext esperava apenas `{user}`
+
+### Correção
+- [x] Identificar causa raiz do problema
+- [x] Implementar correção (endpoints auth.login e auth.register corrigidos)
+- [x] Instalar express-session
+- [x] Criar middleware de sessão
+- [x] Atualizar context.ts para usar sessão
+- [x] Atualizar endpoints login/register/logout para gerenciar sessão
+- [x] Testar login manualmente (SUCESSO! Login funcionando perfeitamente)
+- [x] Validar que redirecionamento funciona (Admin redirecionado para Dashboard CEO)
+
+### Validação com Testes
+- [x] Executar pnpm test para rodar todos os testes
+- [ ] Atualizar testes para usar sistema de sessão (atualmente usam JWT)
+- [ ] Verificar se auth.test.ts passa (8 testes)
+- [ ] Verificar se dre.test.ts passa (8 testes - skipped)
+- [ ] Verificar se permissions.test.ts passa (10 testes - skipped)
+- [ ] Corrigir testes que falharem (system.test.ts com 13 falhas)
