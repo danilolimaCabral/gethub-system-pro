@@ -43,6 +43,41 @@ export const tenantUsers = mysqlTable("tenant_users", {
   userIdx: index("user_idx").on(table.userId),
 }));
 
+// ==================== LICENCIAMENTO ====================
+
+export const clientCompanies = mysqlTable("client_companies", {
+  id: int("id").autoincrement().primaryKey(),
+  companyName: varchar("companyName", { length: 255 }).notNull(),
+  cnpj: varchar("cnpj", { length: 18 }),
+  contactName: varchar("contactName", { length: 255 }).notNull(),
+  email: varchar("email", { length: 320 }).notNull(),
+  phone: varchar("phone", { length: 20 }),
+  tenantId: int("tenantId").notNull().unique(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  tenantIdx: index("client_tenant_idx").on(table.tenantId),
+  emailIdx: index("client_email_idx").on(table.email),
+}));
+
+export const licenses = mysqlTable("licenses", {
+  id: int("id").autoincrement().primaryKey(),
+  licenseKey: varchar("licenseKey", { length: 100 }).notNull().unique(),
+  clientCompanyId: int("clientCompanyId").notNull(),
+  tenantId: int("tenantId").notNull(),
+  status: mysqlEnum("status", ["active", "expired", "cancelled"]).default("active").notNull(),
+  plan: mysqlEnum("plan", ["monthly", "annual", "lifetime"]).default("monthly").notNull(),
+  expiresAt: timestamp("expiresAt").notNull(),
+  activatedAt: timestamp("activatedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  licenseKeyIdx: unique("license_key_idx").on(table.licenseKey),
+  clientIdx: index("license_client_idx").on(table.clientCompanyId),
+  tenantIdx: index("license_tenant_idx").on(table.tenantId),
+  statusIdx: index("license_status_idx").on(table.status),
+}));
+
 // ==================== CADASTROS ====================
 
 export const companies = mysqlTable("companies", {

@@ -1,47 +1,28 @@
 import type { CreateExpressContextOptions } from "@trpc/server/adapters/express";
 import type { User } from "../../drizzle/schema";
-import * as db from "../db";
 import type { Request, Response } from "express";
-import 'express-session';
-
-declare module 'express-session' {
-  interface SessionData {
-    userId?: number;
-    email?: string;
-    role?: string;
-  }
-}
 
 export type TrpcContext = {
   req: Request;
   res: Response;
-  user: User | null;
-  tenantId: number | null;
+  user: User;
+  tenantId: number;
 };
 
 export async function createContext(
   opts: CreateExpressContextOptions
 ): Promise<TrpcContext> {
-  let user: User | null = null;
-  let tenantId: number | null = null;
+  // Sistema sem autenticação - sempre usa tenant 1 e usuário admin mock
+  const user: User = {
+    id: 1,
+    email: 'admin@erpfinanceiro.com',
+    name: 'Administrador',
+    role: 'admin' as const,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
 
-  try {
-    // Verificar se existe sessão ativa
-    const session = (opts.req as any).session;
-    if (session && session.userId) {
-      user = await db.getUserById(session.userId);
-      
-      // Buscar tenantId do usuário
-      if (user) {
-        const tenantUser = await db.getTenantByUserId(user.id);
-        tenantId = tenantUser?.tenantId || null;
-      }
-    }
-  } catch (error) {
-    // Authentication is optional for public procedures.
-    user = null;
-    tenantId = null;
-  }
+  const tenantId = 1;
 
   return {
     req: opts.req as Request,

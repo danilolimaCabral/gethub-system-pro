@@ -61,6 +61,7 @@ export const appRouter = router({
         password: z.string(),
       }))
       .mutation(async ({ input, ctx }) => {
+        console.log('[auth.login] Input received:', JSON.stringify(input));
         const { user } = await auth.loginUser(input.email, input.password);
         
         // Criar sessão

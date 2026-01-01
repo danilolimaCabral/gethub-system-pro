@@ -1,3 +1,15 @@
+CREATE TABLE `alert_history` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`tenantId` int NOT NULL,
+	`alertId` int NOT NULL,
+	`triggeredAt` timestamp NOT NULL DEFAULT (now()),
+	`value` decimal(15,2) NOT NULL,
+	`threshold` decimal(15,2) NOT NULL,
+	`message` text NOT NULL,
+	`notified` boolean NOT NULL DEFAULT false,
+	CONSTRAINT `alert_history_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
 CREATE TABLE `cash_flow` (
 	`id` int AUTO_INCREMENT NOT NULL,
 	`tenantId` int NOT NULL,
@@ -24,6 +36,20 @@ CREATE TABLE `categories` (
 	`createdAt` timestamp NOT NULL DEFAULT (now()),
 	`updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
 	CONSTRAINT `categories_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
+CREATE TABLE `client_companies` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`companyName` varchar(255) NOT NULL,
+	`cnpj` varchar(18),
+	`contactName` varchar(255) NOT NULL,
+	`email` varchar(320) NOT NULL,
+	`phone` varchar(20),
+	`tenantId` int NOT NULL,
+	`createdAt` timestamp NOT NULL DEFAULT (now()),
+	`updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	CONSTRAINT `client_companies_id` PRIMARY KEY(`id`),
+	CONSTRAINT `client_companies_tenantId_unique` UNIQUE(`tenantId`)
 );
 --> statement-breakpoint
 CREATE TABLE `companies` (
@@ -57,6 +83,17 @@ CREATE TABLE `customers` (
 	CONSTRAINT `customers_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
+CREATE TABLE `financial_alerts` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`tenantId` int NOT NULL,
+	`type` enum('receita_baixa','despesa_alta','margem_baixa') NOT NULL,
+	`threshold` decimal(15,2) NOT NULL,
+	`active` boolean NOT NULL DEFAULT true,
+	`createdAt` timestamp NOT NULL DEFAULT (now()),
+	`updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	CONSTRAINT `financial_alerts_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
 CREATE TABLE `import_logs` (
 	`id` int AUTO_INCREMENT NOT NULL,
 	`tenantId` int NOT NULL,
@@ -72,6 +109,22 @@ CREATE TABLE `import_logs` (
 	`createdAt` timestamp NOT NULL DEFAULT (now()),
 	`completedAt` timestamp,
 	CONSTRAINT `import_logs_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
+CREATE TABLE `licenses` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`licenseKey` varchar(100) NOT NULL,
+	`clientCompanyId` int NOT NULL,
+	`tenantId` int NOT NULL,
+	`status` enum('active','expired','cancelled') NOT NULL DEFAULT 'active',
+	`plan` enum('monthly','annual','lifetime') NOT NULL DEFAULT 'monthly',
+	`expiresAt` timestamp NOT NULL,
+	`activatedAt` timestamp,
+	`createdAt` timestamp NOT NULL DEFAULT (now()),
+	`updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	CONSTRAINT `licenses_id` PRIMARY KEY(`id`),
+	CONSTRAINT `licenses_licenseKey_unique` UNIQUE(`licenseKey`),
+	CONSTRAINT `license_key_idx` UNIQUE(`licenseKey`)
 );
 --> statement-breakpoint
 CREATE TABLE `marketplace_balances` (
@@ -101,6 +154,17 @@ CREATE TABLE `marketplaces` (
 	`updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
 	CONSTRAINT `marketplaces_id` PRIMARY KEY(`id`),
 	CONSTRAINT `tenant_code_idx` UNIQUE(`tenantId`,`code`)
+);
+--> statement-breakpoint
+CREATE TABLE `password_reset_tokens` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`userId` int NOT NULL,
+	`token` varchar(255) NOT NULL,
+	`expiresAt` timestamp NOT NULL,
+	`used` boolean NOT NULL DEFAULT false,
+	`createdAt` timestamp NOT NULL DEFAULT (now()),
+	CONSTRAINT `password_reset_tokens_id` PRIMARY KEY(`id`),
+	CONSTRAINT `password_reset_tokens_token_unique` UNIQUE(`token`)
 );
 --> statement-breakpoint
 CREATE TABLE `payables` (
@@ -227,15 +291,40 @@ CREATE TABLE `tenants` (
 	CONSTRAINT `tenants_slug_unique` UNIQUE(`slug`)
 );
 --> statement-breakpoint
+CREATE TABLE `users` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`email` varchar(320) NOT NULL,
+	`password` varchar(255) NOT NULL,
+	`name` text,
+	`role` enum('user','admin') NOT NULL DEFAULT 'user',
+	`permissions` json,
+	`createdAt` timestamp NOT NULL DEFAULT (now()),
+	`updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	`lastSignedIn` timestamp NOT NULL DEFAULT (now()),
+	CONSTRAINT `users_id` PRIMARY KEY(`id`),
+	CONSTRAINT `users_email_unique` UNIQUE(`email`)
+);
+--> statement-breakpoint
+CREATE INDEX `tenant_idx` ON `alert_history` (`tenantId`);--> statement-breakpoint
+CREATE INDEX `alert_idx` ON `alert_history` (`alertId`);--> statement-breakpoint
+CREATE INDEX `triggered_at_idx` ON `alert_history` (`triggeredAt`);--> statement-breakpoint
 CREATE INDEX `tenant_idx` ON `cash_flow` (`tenantId`);--> statement-breakpoint
 CREATE INDEX `tenant_idx` ON `categories` (`tenantId`);--> statement-breakpoint
+CREATE INDEX `client_tenant_idx` ON `client_companies` (`tenantId`);--> statement-breakpoint
+CREATE INDEX `client_email_idx` ON `client_companies` (`email`);--> statement-breakpoint
 CREATE INDEX `tenant_idx` ON `companies` (`tenantId`);--> statement-breakpoint
 CREATE INDEX `tenant_idx` ON `customers` (`tenantId`);--> statement-breakpoint
+CREATE INDEX `tenant_idx` ON `financial_alerts` (`tenantId`);--> statement-breakpoint
 CREATE INDEX `tenant_idx` ON `import_logs` (`tenantId`);--> statement-breakpoint
 CREATE INDEX `user_idx` ON `import_logs` (`userId`);--> statement-breakpoint
+CREATE INDEX `license_client_idx` ON `licenses` (`clientCompanyId`);--> statement-breakpoint
+CREATE INDEX `license_tenant_idx` ON `licenses` (`tenantId`);--> statement-breakpoint
+CREATE INDEX `license_status_idx` ON `licenses` (`status`);--> statement-breakpoint
 CREATE INDEX `tenant_idx` ON `marketplace_balances` (`tenantId`);--> statement-breakpoint
 CREATE INDEX `marketplace_idx` ON `marketplace_balances` (`marketplaceId`);--> statement-breakpoint
 CREATE INDEX `tenant_idx` ON `marketplaces` (`tenantId`);--> statement-breakpoint
+CREATE INDEX `user_idx` ON `password_reset_tokens` (`userId`);--> statement-breakpoint
+CREATE INDEX `token_idx` ON `password_reset_tokens` (`token`);--> statement-breakpoint
 CREATE INDEX `tenant_idx` ON `payables` (`tenantId`);--> statement-breakpoint
 CREATE INDEX `status_idx` ON `payables` (`status`);--> statement-breakpoint
 CREATE INDEX `due_date_idx` ON `payables` (`dueDate`);--> statement-breakpoint

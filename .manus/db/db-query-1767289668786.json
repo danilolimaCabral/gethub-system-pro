@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `licenses` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `licenseKey` varchar(100) NOT NULL UNIQUE,\n  `clientCompanyId` int NOT NULL,\n  `tenantId` int NOT NULL,\n  `status` enum('active','expired','cancelled') NOT NULL DEFAULT 'active',\n  `plan` enum('monthly','annual','lifetime') NOT NULL DEFAULT 'monthly',\n  `expiresAt` timestamp NOT NULL,\n  `activatedAt` timestamp NULL,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  CONSTRAINT `licenses_id` PRIMARY KEY(`id`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2q7zpKXyHy6d6eT.3361d9972713 --database PRmoFLsahKdkvgxbSxCWaH --execute CREATE TABLE IF NOT EXISTS `licenses` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `licenseKey` varchar(100) NOT NULL UNIQUE,\n  `clientCompanyId` int NOT NULL,\n  `tenantId` int NOT NULL,\n  `status` enum('active','expired','cancelled') NOT NULL DEFAULT 'active',\n  `plan` enum('monthly','annual','lifetime') NOT NULL DEFAULT 'monthly',\n  `expiresAt` timestamp NOT NULL,\n  `activatedAt` timestamp NULL,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  CONSTRAINT `licenses_id` PRIMARY KEY(`id`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 298
+}

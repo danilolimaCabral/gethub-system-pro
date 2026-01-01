@@ -5,50 +5,8 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1767200119354,
-      "tag": "0000_striped_blue_blade",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1767200223945,
-      "tag": "0001_shallow_frightful_four",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1767201590942,
-      "tag": "0002_striped_tony_stark",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "5",
-      "when": 1767257621043,
-      "tag": "0003_big_true_believers",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "5",
-      "when": 1767257639907,
-      "tag": "0004_hard_maelstrom",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "5",
-      "when": 1767265915963,
-      "tag": "0005_faulty_blizzard",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "5",
-      "when": 1767273671208,
-      "tag": "0006_modern_slyde",
+      "when": 1767289636587,
+      "tag": "0000_same_leech",
       "breakpoints": true
     }
   ]

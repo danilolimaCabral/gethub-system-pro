@@ -444,3 +444,62 @@
 - [x] Limpar logs de debug
 - [x] Testar Dashboard com dados reais
 - [x] Dashboard CEO agora mostra valores corretos (R$ 3.895.529,41 receita, R$ 1.792.931,54 despesas)
+
+## Bug de Redirecionamento Admin
+- [ ] Investigar por que admin é redirecionado para área de admin
+- [ ] Identificar código responsável pelo redirecionamento
+- [ ] Corrigir para ir direto ao Dashboard
+- [ ] Testar login do admin
+- [ ] Verificar que vai direto ao Dashboard
+
+## Remover Sistema de Autenticação (Acesso Aberto)
+- [ ] Remover proteção de rotas no App.tsx
+- [ ] Remover middleware de autenticação no backend
+- [ ] Fixar tenantId padrão no context (tenant 1)
+- [ ] Redirecionar rota raiz (/) direto para Dashboard
+- [ ] Remover AuthContext e AuthProvider
+- [ ] Testar acesso direto ao Dashboard sem login
+
+## Sistema de Licenciamento para Venda do ERP
+
+### Backend e Schema
+- [x] Criar tabela licenses (código único, tenantId, status, dataExpiracao, plano)
+- [x] Criar tabela client_companies (nome empresa, CNPJ, contato, email, telefone)
+- [x] Implementar gerador de códigos de licença únicos
+- [x] Criar endpoint para cadastrar novo cliente + licença
+- [x] Criar endpoint para listar todos os clientes e licenças
+- [x] Criar endpoint para renovar/cancelar licença
+- [x] Criar endpoint para validar código de licença na ativação
+- [x] Implementar middleware de verificação de licença ativa
+
+### Painel Admin (Gestão de Clientes)
+- [ ] Criar página /admin/clients para listar clientes
+- [ ] Implementar formulário de cadastro de novo cliente
+- [ ] Mostrar status da licença (Ativa, Expirada, Cancelada)
+- [ ] Adicionar botão de renovar licença
+- [ ] Adicionar botão de cancelar licença
+- [ ] Implementar filtros (status, data de expiração)
+- [ ] Adicionar exportação de lista de clientes
+
+### Tela de Ativação (Cliente Final)
+- [ ] Criar página /activate para ativação de licença
+- [ ] Implementar formulário com código de licença
+- [ ] Validar código e mostrar dados da empresa
+- [ ] Criar formulário de cadastro do usuário admin do cliente
+- [ ] Associar usuário ao tenant da licença
+- [ ] Redirecionar para dashboard após ativação
+- [ ] Mostrar mensagem de boas-vindas
+
+### Autenticação com Licença
+- [ ] Modificar login para verificar licença ativa
+- [ ] Bloquear acesso se licença expirada
+- [ ] Mostrar aviso de expiração próxima (7 dias)
+- [ ] Criar página de licença expirada
+- [ ] Implementar renovação via painel admin
+
+### Testes
+- [ ] Testar cadastro de novo cliente pelo admin
+- [ ] Testar ativação de licença pelo cliente
+- [ ] Testar bloqueio de acesso com licença expirada
+- [ ] Testar renovação de licença
+- [ ] Testar cancelamento de licença

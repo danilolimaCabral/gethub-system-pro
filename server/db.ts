@@ -17,7 +17,9 @@ import {
   stockMovements, InsertStockMovement,
   systemParameters, InsertSystemParameter,
   importLogs, InsertImportLog,
-  passwordResetTokens
+  passwordResetTokens,
+  clientCompanies,
+  licenses
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -811,3 +813,244 @@ export async function getDREComparative(tenantId: number, year: number) {
 // Export tables and functions for use in other modules
 export { eq, and, or, desc, asc, gte, lte, sql };
 export { passwordResetTokens };
+
+
+// ==================== LICENSING MANAGEMENT ====================
+
+export async function generateLicenseKey(): Promise<string> {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  const segments = 4;
+  const segmentLength = 4;
+  
+  const parts = [];
+  for (let i = 0; i < segments; i++) {
+    let segment = '';
+    for (let j = 0; j < segmentLength; j++) {
+      segment += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    parts.push(segment);
+  }
+  
+  return parts.join('-');
+}
+
+export async function createClientCompany(data: {
+  companyName: string;
+  cnpj?: string;
+  contactName: string;
+  email: string;
+  phone?: string;
+  plan: 'monthly' | 'annual' | 'lifetime';
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // Criar tenant para o cliente
+  const [tenant] = await db.insert(tenants).values({
+    name: data.companyName,
+    slug: data.companyName.toLowerCase().replace(/[^a-z0-9]/g, '-') + '-' + Date.now(),
+    ownerId: 1, // Admin do sistema
+    active: true,
+  });
+
+  const tenantId = Number(tenant.insertId);
+
+  // Criar registro do cliente
+  const [client] = await db.insert(clientCompanies).values({
+    companyName: data.companyName,
+    cnpj: data.cnpj,
+    contactName: data.contactName,
+    email: data.email,
+    phone: data.phone,
+    tenantId,
+  });
+
+  const clientCompanyId = Number(client.insertId);
+
+  // Gerar licença
+  const licenseKey = await generateLicenseKey();
+  
+  // Calcular data de expiração
+  let expiresAt: Date;
+  if (data.plan === 'lifetime') {
+    expiresAt = new Date('2099-12-31');
+  } else if (data.plan === 'annual') {
+    expiresAt = new Date();
+    expiresAt.setFullYear(expiresAt.getFullYear() + 1);
+  } else {
+    expiresAt = new Date();
+    expiresAt.setMonth(expiresAt.getMonth() + 1);
+  }
+
+  await db.insert(licenses).values({
+    licenseKey,
+    clientCompanyId,
+    tenantId,
+    status: 'active',
+    plan: data.plan,
+    expiresAt,
+  });
+
+  return { clientCompanyId, tenantId, licenseKey };
+}
+
+export async function listClientCompanies() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const results = await db
+    .select({
+      id: clientCompanies.id,
+      companyName: clientCompanies.companyName,
+      cnpj: clientCompanies.cnpj,
+      contactName: clientCompanies.contactName,
+      email: clientCompanies.email,
+      phone: clientCompanies.phone,
+      tenantId: clientCompanies.tenantId,
+      createdAt: clientCompanies.createdAt,
+      licenseKey: licenses.licenseKey,
+      licenseStatus: licenses.status,
+      plan: licenses.plan,
+      expiresAt: licenses.expiresAt,
+      activatedAt: licenses.activatedAt,
+    })
+    .from(clientCompanies)
+    .leftJoin(licenses, eq(clientCompanies.id, licenses.clientCompanyId))
+    .orderBy(desc(clientCompanies.createdAt));
+
+  return results;
+}
+
+export async function validateLicenseKey(licenseKey: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const [license] = await db
+    .select({
+      id: licenses.id,
+      clientCompanyId: licenses.clientCompanyId,
+      tenantId: licenses.tenantId,
+      status: licenses.status,
+      plan: licenses.plan,
+      expiresAt: licenses.expiresAt,
+      companyName: clientCompanies.companyName,
+      cnpj: clientCompanies.cnpj,
+      email: clientCompanies.email,
+    })
+    .from(licenses)
+    .leftJoin(clientCompanies, eq(licenses.clientCompanyId, clientCompanies.id))
+    .where(eq(licenses.licenseKey, licenseKey))
+    .limit(1);
+
+  if (!license) {
+    throw new Error("Código de licença inválido");
+  }
+
+  if (license.status !== 'active') {
+    throw new Error(`Licença ${license.status === 'expired' ? 'expirada' : 'cancelada'}`);
+  }
+
+  if (new Date(license.expiresAt) < new Date()) {
+    // Atualizar status para expirada
+    await db
+      .update(licenses)
+      .set({ status: 'expired' })
+      .where(eq(licenses.id, license.id));
+    
+    throw new Error("Licença expirada");
+  }
+
+  return license;
+}
+
+export async function activateLicense(licenseKey: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .update(licenses)
+    .set({ activatedAt: new Date() })
+    .where(eq(licenses.licenseKey, licenseKey));
+}
+
+export async function renewLicense(clientCompanyId: number, months: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const [license] = await db
+    .select()
+    .from(licenses)
+    .where(eq(licenses.clientCompanyId, clientCompanyId))
+    .limit(1);
+
+  if (!license) {
+    throw new Error("Licença não encontrada");
+  }
+
+  const newExpiresAt = new Date(license.expiresAt);
+  newExpiresAt.setMonth(newExpiresAt.getMonth() + months);
+
+  await db
+    .update(licenses)
+    .set({ 
+      expiresAt: newExpiresAt,
+      status: 'active'
+    })
+    .where(eq(licenses.id, license.id));
+
+  return { expiresAt: newExpiresAt };
+}
+
+export async function cancelLicense(clientCompanyId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .update(licenses)
+    .set({ status: 'cancelled' })
+    .where(eq(licenses.clientCompanyId, clientCompanyId));
+}
+
+export async function checkLicenseStatus(tenantId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const [license] = await db
+    .select()
+    .from(licenses)
+    .where(eq(licenses.tenantId, tenantId))
+    .limit(1);
+
+  if (!license) {
+    return { valid: false, reason: 'no_license' };
+  }
+
+  if (license.status !== 'active') {
+    return { valid: false, reason: license.status };
+  }
+
+  const now = new Date();
+  const expiresAt = new Date(license.expiresAt);
+  
+  if (expiresAt < now) {
+    // Atualizar status
+    await db
+      .update(licenses)
+      .set({ status: 'expired' })
+      .where(eq(licenses.id, license.id));
+    
+    return { valid: false, reason: 'expired' };
+  }
+
+  // Verificar se está próximo de expirar (7 dias)
+  const daysUntilExpiry = Math.ceil((expiresAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+  const warning = daysUntilExpiry <= 7;
+
+  return { 
+    valid: true, 
+    warning, 
+    daysUntilExpiry,
+    expiresAt: license.expiresAt,
+    plan: license.plan
+  };
+}

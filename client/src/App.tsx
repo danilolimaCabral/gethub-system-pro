@@ -34,7 +34,7 @@ function Router() {
       <Route path="/register" component={Register} />
       <Route path="/forgot-password" component={ForgotPassword} />
       <Route path="/reset-password/:token" component={ResetPassword} />
-      <Route path={"/"} component={Home} />
+      <Route path="/" component={() => { setLocation('/dashboard'); return null; }} />
       <Route path="/import" component={Import} />
       <Route path="/cashflow" component={CashFlow} />
       <Route path="/receivables" component={Receivables} />
