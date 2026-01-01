@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO tenant_users (tenantId, userId, role) VALUES (1, 1, 'owner');",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2q7zpKXyHy6d6eT.3361d9972713 --database PRmoFLsahKdkvgxbSxCWaH --execute INSERT INTO tenant_users (tenantId, userId, role) VALUES (1, 1, 'owner');",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 95
+}
