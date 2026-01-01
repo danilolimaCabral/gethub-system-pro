@@ -305,8 +305,8 @@
 - [x] Implementar tabela de DRE detalhada
 - [x] Adicionar gráfico de evolução mensal
 - [x] Adicionar gráfico de comparativo de receitas vs custos
-- [ ] Implementar exportação de DRE para Excel
-- [ ] Implementar exportação de DRE para PDF
+- [x] Implementar exportação de DRE para Excel
+- [x] Implementar exportação de DRE para PDF
 - [ ] Testar módulo de DRE completo
 
 ## Testes Finais do Sistema Completo

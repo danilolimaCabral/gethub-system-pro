@@ -147,6 +147,97 @@ export const appRouter = router({
       .query(async ({ input }) => {
         return db.getDREComparative(input.tenantId, input.year);
       }),
+
+    exportExcel: protectedProcedure
+      .input(z.object({
+        tenantId: z.number(),
+        month: z.number().min(1).max(12),
+        year: z.number(),
+      }))
+      .mutation(async ({ input }) => {
+        const ExcelJS = (await import('exceljs')).default;
+        const dreData = await db.getDREData(input.tenantId, input.month, input.year);
+        const comparativeData = await db.getDREComparative(input.tenantId, input.year);
+
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('DRE');
+
+        // Header
+        worksheet.columns = [
+          { header: 'Descrição', key: 'description', width: 30 },
+          { header: 'Valor (R$)', key: 'value', width: 20 },
+        ];
+
+        // Styling header
+        worksheet.getRow(1).font = { bold: true };
+        worksheet.getRow(1).fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: 'FF3B82F6' },
+        };
+
+        // Add data
+        worksheet.addRow({ description: 'Receitas Totais', value: dreData.receitas });
+        worksheet.addRow({ description: 'Despesas Totais', value: dreData.despesas });
+        worksheet.addRow({ description: 'Margem Bruta', value: dreData.margemBruta });
+        worksheet.addRow({ description: 'Margem Líquida (%)', value: dreData.margemLiquida.toFixed(2) });
+
+        // Add comparative data
+        worksheet.addRow({});
+        worksheet.addRow({ description: 'Comparativo Anual', value: '' });
+        worksheet.addRow({ description: 'Mês', value: 'Receitas' });
+
+        comparativeData.forEach((month: any) => {
+          worksheet.addRow({ description: `Mês ${month.month}`, value: month.receitas });
+        });
+
+        // Generate buffer
+        const buffer = await workbook.xlsx.writeBuffer();
+        return {
+          data: Buffer.from(buffer).toString('base64'),
+          filename: `DRE_${input.month}_${input.year}.xlsx`,
+        };
+      }),
+
+    exportPDF: protectedProcedure
+      .input(z.object({
+        tenantId: z.number(),
+        month: z.number().min(1).max(12),
+        year: z.number(),
+      }))
+      .mutation(async ({ input }) => {
+        const { jsPDF } = await import('jspdf');
+        const autoTable = (await import('jspdf-autotable')).default;
+        const dreData = await db.getDREData(input.tenantId, input.month, input.year);
+
+        const doc = new jsPDF();
+
+        // Title
+        doc.setFontSize(18);
+        doc.text('Demonstrativo de Resultados (DRE)', 14, 20);
+        doc.setFontSize(12);
+        doc.text(`Período: ${input.month}/${input.year}`, 14, 30);
+
+        // Table
+        autoTable(doc, {
+          startY: 40,
+          head: [['Descrição', 'Valor (R$)']],
+          body: [
+            ['Receitas Totais', dreData.receitas.toFixed(2)],
+            ['Despesas Totais', dreData.despesas.toFixed(2)],
+            ['Margem Bruta', dreData.margemBruta.toFixed(2)],
+            ['Margem Líquida (%)', dreData.margemLiquida.toFixed(2)],
+          ],
+          theme: 'grid',
+          headStyles: { fillColor: [59, 130, 246] },
+        });
+
+        const pdfBuffer = doc.output('arraybuffer');
+        return {
+          data: Buffer.from(pdfBuffer).toString('base64'),
+          filename: `DRE_${input.month}_${input.year}.pdf`,
+        };
+      }),
   }),
 
   tenant: router({

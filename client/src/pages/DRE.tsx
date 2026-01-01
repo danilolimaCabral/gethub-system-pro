@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -68,11 +69,63 @@ export default function DRE() {
 
   const monthName = MONTHS.find(m => m.value === selectedMonth.toString())?.label || "";
 
+  const exportExcelMutation = trpc.dre.exportExcel.useMutation({
+    onSuccess: (data) => {
+      const link = document.createElement('a');
+      link.href = `data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,${data.data}`;
+      link.download = data.filename;
+      link.click();
+      toast.success("DRE exportado para Excel com sucesso!");
+    },
+    onError: () => {
+      toast.error("Falha ao exportar DRE para Excel");
+    },
+  });
+
+  const exportPDFMutation = trpc.dre.exportPDF.useMutation({
+    onSuccess: (data) => {
+      const link = document.createElement('a');
+      link.href = `data:application/pdf;base64,${data.data}`;
+      link.download = data.filename;
+      link.click();
+      toast.success("DRE exportado para PDF com sucesso!");
+    },
+    onError: () => {
+      toast.error("Falha ao exportar DRE para PDF");
+    },
+  });
+
+  const handleExportExcel = () => {
+    exportExcelMutation.mutate({ tenantId, month: selectedMonth, year: selectedYear });
+  };
+
+  const handleExportPDF = () => {
+    exportPDFMutation.mutate({ tenantId, month: selectedMonth, year: selectedYear });
+  };
+
   return (
     <div className="p-6 space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-white mb-2">Demonstrativo de Resultados (DRE)</h1>
-        <p className="text-slate-400">Análise financeira mensal e comparativa do seu negócio</p>
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold text-white mb-2">Demonstrativo de Resultados (DRE)</h1>
+          <p className="text-slate-400">Análise financeira mensal e comparativa do seu negócio</p>
+        </div>
+        <div className="flex gap-2">
+          <Button
+            onClick={handleExportExcel}
+            disabled={exportExcelMutation.isPending}
+            className="bg-green-600 hover:bg-green-700"
+          >
+            {exportExcelMutation.isPending ? "Exportando..." : "Exportar Excel"}
+          </Button>
+          <Button
+            onClick={handleExportPDF}
+            disabled={exportPDFMutation.isPending}
+            className="bg-red-600 hover:bg-red-700"
+          >
+            {exportPDFMutation.isPending ? "Exportando..." : "Exportar PDF"}
+          </Button>
+        </div>
       </div>
 
       {/* Seletor de Período */}
