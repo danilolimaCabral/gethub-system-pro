@@ -49,6 +49,11 @@ export default function Home() {
     setLocation("/dashboard");
   };
 
+  const handleAccessDashboard = () => {
+    // Admin pode acessar dashboard sem selecionar tenant
+    setLocation("/dashboard");
+  };
+
   const handleLogout = () => {
     logout();
     setLocation("/login");
@@ -59,7 +64,11 @@ export default function Home() {
     if (!isAuthenticated && !loading) {
       setLocation("/login");
     }
-  }, [isAuthenticated, loading, setLocation]);
+    // Se autenticado e não tem tenants, redirecionar direto para dashboard
+    if (isAuthenticated && !loading && tenants && tenants.length === 0) {
+      setLocation("/dashboard");
+    }
+  }, [isAuthenticated, loading, tenants, setLocation]);
 
   if (loading) {
     return (

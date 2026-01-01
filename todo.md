@@ -233,3 +233,12 @@
 - [ ] Adicionar vídeos tutoriais (links)
 - [ ] Preparar material de venda
 - [ ] Criar página de landing page
+
+## Bug de Redirecionamento e Criação de Empresa
+- [x] Remover obrigatoriedade de criar empresa para admin
+- [x] Corrigir loop de redirecionamento que volta para tela de criação
+- [x] Permitir acesso direto ao Dashboard sem criar tenant
+- [x] Adicionar redirecionamento automático para dashboard quando não tem tenants
+- [x] Testar fluxo de login → Dashboard sem interrupções
+- [x] Sistema agora redireciona automaticamente para Dashboard
+- [x] Bug de redirecionamento corrigido
