@@ -329,3 +329,33 @@ export type InsertSystemParameter = typeof systemParameters.$inferInsert;
 
 export type ImportLog = typeof importLogs.$inferSelect;
 export type InsertImportLog = typeof importLogs.$inferInsert;
+
+
+// ==================== ALERTAS FINANCEIROS ====================
+
+export const financialAlerts = mysqlTable("financial_alerts", {
+  id: int("id").autoincrement().primaryKey(),
+  tenantId: int("tenantId").notNull(),
+  type: mysqlEnum("type", ["receita_baixa", "despesa_alta", "margem_baixa"]).notNull(),
+  threshold: decimal("threshold", { precision: 15, scale: 2 }).notNull(),
+  active: boolean("active").default(true).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  tenantIdx: index("tenant_idx").on(table.tenantId),
+}));
+
+export const alertHistory = mysqlTable("alert_history", {
+  id: int("id").autoincrement().primaryKey(),
+  tenantId: int("tenantId").notNull(),
+  alertId: int("alertId").notNull(),
+  triggeredAt: timestamp("triggeredAt").defaultNow().notNull(),
+  value: decimal("value", { precision: 15, scale: 2 }).notNull(),
+  threshold: decimal("threshold", { precision: 15, scale: 2 }).notNull(),
+  message: text("message").notNull(),
+  notified: boolean("notified").default(false).notNull(),
+}, (table) => ({
+  tenantIdx: index("tenant_idx").on(table.tenantId),
+  alertIdx: index("alert_idx").on(table.alertId),
+  triggeredAtIdx: index("triggered_at_idx").on(table.triggeredAt),
+}));

@@ -331,3 +331,53 @@
 - [x] Admin deve pular tela de seleção de empresa e ir direto para Dashboard
 - [ ] Criar empresa automaticamente para admin no primeiro acesso
 - [x] Redirecionar admin automaticamente após login
+
+## Dashboard de Alertas Financeiros
+
+### Backend e Schema
+- [ ] Criar tabela de alertas no schema (tipo, limite, ativo, tenant)
+- [ ] Criar tabela de histórico de alertas disparados
+- [ ] Implementar função para verificar alertas de receitas
+- [ ] Implementar função para verificar alertas de despesas
+- [ ] Criar endpoint tRPC para configurar alertas
+- [ ] Criar endpoint tRPC para listar alertas ativos
+- [ ] Criar endpoint tRPC para obter histórico de alertas
+
+### Frontend
+- [ ] Criar página de Alertas (/alerts)
+- [ ] Adicionar link de Alertas no menu
+- [ ] Implementar formulário de configuração de alertas
+- [ ] Criar cards com alertas ativos
+- [ ] Implementar lista de histórico de alertas
+- [ ] Adicionar notificações visuais de alertas disparados
+- [ ] Testar sistema de alertas completo
+
+### Notificações
+- [ ] Implementar envio de notificação para owner quando alerta disparar
+- [ ] Criar função de verificação periódica de alertas
+- [ ] Adicionar badge de alertas no menu lateral
+
+## Dashboard de Alertas Financeiros
+
+### Backend e Schema
+- [ ] Criar tabela de alertas no schema (tipo, limite, ativo, tenant)
+- [ ] Criar tabela de histórico de alertas disparados
+- [ ] Implementar função para verificar alertas de receitas
+- [ ] Implementar função para verificar alertas de despesas
+- [ ] Criar endpoint tRPC para configurar alertas
+- [ ] Criar endpoint tRPC para listar alertas ativos
+- [ ] Criar endpoint tRPC para obter histórico de alertas
+
+### Frontend
+- [ ] Criar página de Alertas (/alerts)
+- [ ] Adicionar link de Alertas no menu
+- [ ] Implementar formulário de configuração de alertas
+- [ ] Criar cards com alertas ativos
+- [ ] Implementar lista de histórico de alertas
+- [ ] Adicionar notificações visuais de alertas disparados
+- [ ] Testar sistema de alertas completo
+
+### Notificações
+- [ ] Implementar envio de notificação para owner quando alerta disparar
+- [ ] Criar função de verificação periódica de alertas
+- [ ] Adicionar badge de alertas no menu lateral
