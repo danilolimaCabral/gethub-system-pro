@@ -28,10 +28,12 @@ export default function Login() {
     try {
       await login(email, password);
       toast.success("Login realizado com sucesso!");
-      setLocation("/");
+      // Aguardar um pouco para garantir que o estado foi atualizado
+      setTimeout(() => {
+        setLocation("/dashboard");
+      }, 100);
     } catch (error: any) {
       toast.error(error.message || "Erro ao fazer login");
-    } finally {
       setIsLoading(false);
     }
   };
