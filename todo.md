@@ -242,3 +242,27 @@
 - [x] Testar fluxo de login → Dashboard sem interrupções
 - [x] Sistema agora redireciona automaticamente para Dashboard
 - [x] Bug de redirecionamento corrigido
+
+## Tutorial Interativo e Configurações
+
+### Tutorial Guiado (react-joyride)
+- [x] Instalar biblioteca react-joyride
+- [x] Criar componente Tutorial com passos do tour
+- [x] Implementar lógica para mostrar tutorial apenas na primeira vez
+- [x] Adicionar passos do tour para Dashboard
+- [x] Adicionar passos do tour para módulos principais
+- [x] Salvar estado do tutorial no localStorage
+- [x] Adicionar botão para reexibir tutorial
+
+### Página de Configurações
+- [x] Criar página de Configurações (/settings)
+- [x] Adicionar link para Configurações no menu lateral
+- [x] Implementar formulário de alteração de senha
+- [x] Implementar formulário de alteração de dados pessoais
+- [x] Adicionar validação de senha atual
+- [x] Criar endpoint tRPC para atualizar senha
+- [x] Criar endpoint tRPC para atualizar dados do usuário
+- [x] Adicionar feedback visual de sucesso/erro
+- [x] Testar alteração de senha
+- [x] Testar alteração de dados pessoais
+- [x] Testar tutorial interativo completo

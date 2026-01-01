@@ -100,3 +100,25 @@ export async function validateToken(token: string) {
 
   return user;
 }
+
+export async function updatePassword(userId: number, currentPassword: string, newPassword: string): Promise<boolean> {
+  // Buscar usuário
+  const user = await db.getUserById(userId);
+  if (!user) {
+    return false;
+  }
+
+  // Verificar senha atual
+  const isValid = await comparePassword(currentPassword, user.password);
+  if (!isValid) {
+    return false;
+  }
+
+  // Hash da nova senha
+  const hashedPassword = await hashPassword(newPassword);
+
+  // Atualizar senha
+  await db.updateUserPassword(userId, hashedPassword);
+
+  return true;
+}

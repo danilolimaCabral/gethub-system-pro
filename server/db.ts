@@ -82,6 +82,20 @@ export async function updateUserLastSignIn(userId: number) {
   await db.update(users).set({ lastSignedIn: new Date() }).where(eq(users.id, userId));
 }
 
+export async function updateUser(userId: number, data: { name?: string; email?: string }) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.update(users).set(data).where(eq(users.id, userId));
+}
+
+export async function updateUserPassword(userId: number, hashedPassword: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.update(users).set({ password: hashedPassword }).where(eq(users.id, userId));
+}
+
 // ==================== TENANT MANAGEMENT ====================
 
 export async function createTenant(data: InsertTenant): Promise<number> {

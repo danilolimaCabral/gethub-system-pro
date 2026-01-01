@@ -20,6 +20,7 @@ import Customers from "./pages/Customers";
 import Products from "./pages/Products";
 import Stock from "./pages/Stock";
 import Settings from "./pages/Settings";
+import { Tutorial } from "./components/Tutorial";
 
 function Router() {
   return (
@@ -55,6 +56,7 @@ function App() {
       <ThemeProvider defaultTheme="dark">
         <TooltipProvider>
           <Toaster />
+          <Tutorial />
           <Router />
         </TooltipProvider>
       </ThemeProvider>

@@ -18,6 +18,7 @@ import {
   Menu,
   X,
   ArrowLeft,
+  Upload,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
@@ -30,15 +31,20 @@ interface NavItem {
   badge?: string;
 }
 
-const navItems: NavItem[] = [
-  { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { title: "Caixa", href: "/cash-flow", icon: Wallet },
-  { title: "Recebíveis", href: "/receivables", icon: TrendingUp },
-  { title: "Pagáveis", href: "/payables", icon: TrendingDown },
+interface NavItemWithTour extends NavItem {
+  dataTour?: string;
+}
+
+const navItems: NavItemWithTour[] = [
+  { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard, dataTour: "dashboard" },
+  { title: "Caixa", href: "/cash-flow", icon: Wallet, dataTour: "cashflow" },
+  { title: "Recebíveis", href: "/receivables", icon: TrendingUp, dataTour: "receivables" },
+  { title: "Pagáveis", href: "/payables", icon: TrendingDown, dataTour: "payables" },
   { title: "Estoque", href: "/stock", icon: Package },
+  { title: "Importar Planilha", href: "/import", icon: Upload, dataTour: "import" },
 ];
 
-const cadastrosItems: NavItem[] = [
+const cadastrosItems: NavItemWithTour[] = [
   { title: "Empresas", href: "/companies", icon: Building2 },
   { title: "Produtos", href: "/products", icon: ShoppingCart },
   { title: "Clientes", href: "/customers", icon: Users },
@@ -69,7 +75,7 @@ export default function ERPLayout({ children }: ERPLayoutProps) {
     setMobileMenuOpen(false);
   }, [location]);
 
-  const NavLink = ({ item }: { item: NavItem }) => {
+  const NavLink = ({ item }: { item: NavItemWithTour }) => {
     const Icon = item.icon;
     const isActive = location === item.href;
 
@@ -80,6 +86,7 @@ export default function ERPLayout({ children }: ERPLayoutProps) {
             "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all hover:bg-slate-700/50",
             isActive ? "bg-blue-600 text-white" : "text-slate-300 hover:text-white"
           )}
+          data-tour={item.dataTour}
         >
           <Icon className="h-4 w-4" />
           {item.title}
@@ -136,7 +143,7 @@ export default function ERPLayout({ children }: ERPLayoutProps) {
             <h3 className="mb-2 px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">
               Cadastros
             </h3>
-            <nav className="space-y-1">
+            <nav className="space-y-1" data-tour="cadastros">
               {cadastrosItems.map((item) => (
                 <NavLink key={item.href} item={item} />
               ))}
@@ -156,7 +163,7 @@ export default function ERPLayout({ children }: ERPLayoutProps) {
         </div>
       </ScrollArea>
 
-      <div className="border-t border-slate-700 p-4">
+      <div className="border-t border-slate-700 p-4" data-tour="user-menu">
         <div className="flex items-center gap-3 mb-3">
           <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm font-semibold">
             {user?.name?.charAt(0).toUpperCase()}

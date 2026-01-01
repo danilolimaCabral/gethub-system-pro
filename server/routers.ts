@@ -60,6 +60,41 @@ export const appRouter = router({
     }),
   }),
 
+  user: router({
+    updateProfile: protectedProcedure
+      .input(z.object({
+        name: z.string(),
+        email: z.string().email(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        await db.updateUser(ctx.user.id, {
+          name: input.name,
+          email: input.email,
+        });
+        return { success: true };
+      }),
+
+    updatePassword: protectedProcedure
+      .input(z.object({
+        currentPassword: z.string(),
+        newPassword: z.string().min(6),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const success = await auth.updatePassword(
+          ctx.user.id,
+          input.currentPassword,
+          input.newPassword
+        );
+        if (!success) {
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "Senha atual incorreta",
+          });
+        }
+        return { success: true };
+      }),
+  }),
+
   tenant: router({
     list: protectedProcedure.query(async ({ ctx }) => {
       return db.listUserTenants(ctx.user.id);
