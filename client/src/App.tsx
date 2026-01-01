@@ -20,6 +20,8 @@ import Customers from "./pages/Customers";
 import Products from "./pages/Products";
 import Stock from "./pages/Stock";
 import Settings from "./pages/Settings";
+import Users from "./pages/Users";
+import DRE from "./pages/DRE";
 import { Tutorial } from "./components/Tutorial";
 
 function Router() {
@@ -44,6 +46,8 @@ function Router() {
       <Route path={"/payables"} component={Payables} />
       <Route path={"/stock"} component={Stock} />
       <Route path={"/settings"} component={Settings} />
+      <Route path={"/users"} component={Users} />
+      <Route path={"/dre"} component={DRE} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>

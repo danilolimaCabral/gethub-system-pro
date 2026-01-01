@@ -96,6 +96,35 @@ export async function updateUserPassword(userId: number, hashedPassword: string)
   await db.update(users).set({ password: hashedPassword }).where(eq(users.id, userId));
 }
 
+export async function updateUserPermissions(userId: number, permissions: string[]) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.update(users).set({ permissions }).where(eq(users.id, userId));
+}
+
+export async function getUserPermissions(userId: number): Promise<string[]> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const user = await db.select({ permissions: users.permissions }).from(users).where(eq(users.id, userId)).limit(1);
+  return user[0]?.permissions || [];
+}
+
+export async function getAllUsers() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  return await db.select({
+    id: users.id,
+    email: users.email,
+    name: users.name,
+    role: users.role,
+    permissions: users.permissions,
+    createdAt: users.createdAt
+  }).from(users);
+}
+
 // ==================== TENANT MANAGEMENT ====================
 
 export async function createTenant(data: InsertTenant): Promise<number> {
@@ -663,3 +692,108 @@ export const listCompanies = getCompanies;
 export const listCategories = getCategories;
 export const listMarketplaces = getMarketplaces;
 export const listSuppliers = getSuppliers;
+
+
+// ==================== DRE (DEMONSTRATIVO DE RESULTADOS) ====================
+
+export async function getDREData(tenantId: number, month: number, year: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // Data range for the month
+  const startDate = new Date(year, month - 1, 1);
+  const endDate = new Date(year, month, 0, 23, 59, 59);
+
+  // Get receivables (Receitas)
+  const receivablesData = await db
+    .select({
+      total: sql<number>`SUM(CAST(${receivables.amount} AS DECIMAL(15,2)))`,
+    })
+    .from(receivables)
+    .where(
+      and(
+        eq(receivables.tenantId, tenantId),
+        gte(receivables.expectedDate, startDate),
+        lte(receivables.expectedDate, endDate),
+        eq(receivables.status, "Recebido")
+      )
+    );
+
+  // Get payables (Despesas)
+  const payablesData = await db
+    .select({
+      total: sql<number>`SUM(CAST(${payables.amount} AS DECIMAL(15,2)))`,
+    })
+    .from(payables)
+    .where(
+      and(
+        eq(payables.tenantId, tenantId),
+        gte(payables.dueDate, startDate),
+        lte(payables.dueDate, endDate),
+        eq(payables.status, "Pago")
+      )
+    );
+
+  const totalReceitas = parseFloat(receivablesData[0]?.total?.toString() || "0");
+  const totalDespesas = parseFloat(payablesData[0]?.total?.toString() || "0");
+
+  return {
+    month,
+    year,
+    receitas: totalReceitas,
+    despesas: totalDespesas,
+    margemBruta: totalReceitas - totalDespesas,
+    margemLiquida: ((totalReceitas - totalDespesas) / totalReceitas) * 100 || 0,
+  };
+}
+
+export async function getDREComparative(tenantId: number, year: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const months = [];
+  for (let month = 1; month <= 12; month++) {
+    const startDate = new Date(year, month - 1, 1);
+    const endDate = new Date(year, month, 0, 23, 59, 59);
+
+    const receivablesData = await db
+      .select({
+        total: sql<number>`SUM(CAST(${receivables.amount} AS DECIMAL(15,2)))`,
+      })
+      .from(receivables)
+      .where(
+        and(
+          eq(receivables.tenantId, tenantId),
+          gte(receivables.expectedDate, startDate),
+          lte(receivables.expectedDate, endDate),
+          eq(receivables.status, "Recebido")
+        )
+      );
+
+    const payablesData = await db
+      .select({
+        total: sql<number>`SUM(CAST(${payables.amount} AS DECIMAL(15,2)))`,
+      })
+      .from(payables)
+      .where(
+        and(
+          eq(payables.tenantId, tenantId),
+          gte(payables.dueDate, startDate),
+          lte(payables.dueDate, endDate),
+          eq(payables.status, "Pago")
+        )
+      );
+
+    const totalReceitas = parseFloat(receivablesData[0]?.total?.toString() || "0");
+    const totalDespesas = parseFloat(payablesData[0]?.total?.toString() || "0");
+
+    months.push({
+      month,
+      receitas: totalReceitas,
+      despesas: totalDespesas,
+      lucro: totalReceitas - totalDespesas,
+    });
+  }
+
+  return months;
+}

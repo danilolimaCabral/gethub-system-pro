@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, decimal, boolean, index, unique } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, decimal, boolean, index, unique, json } from "drizzle-orm/mysql-core";
 
 /**
  * Sistema ERP Financeiro Multi-Tenant
@@ -13,6 +13,7 @@ export const users = mysqlTable("users", {
   password: varchar("password", { length: 255 }).notNull(),
   name: text("name"),
   role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
+  permissions: json("permissions").$type<string[]>(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),

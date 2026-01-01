@@ -266,3 +266,68 @@
 - [x] Testar alteração de senha
 - [x] Testar alteração de dados pessoais
 - [x] Testar tutorial interativo completo
+
+## Sistema de Permissões por Módulo
+
+### Backend e Schema
+- [x] Adicionar campo permissions no schema de usuários (JSON)
+- [x] Criar enum de módulos disponíveis
+- [x] Implementar função para verificar permissões no backend
+- [x] Criar endpoint tRPC para atualizar permissões de usuário
+- [x] Criar endpoint tRPC para listar permissões de usuário
+- [x] Adicionar middleware de verificação de permissões
+
+### Frontend
+- [x] Criar página de gerenciamento de permissões (/users)
+- [x] Implementar interface para admin gerenciar permissões
+- [x] Adicionar checkboxes para cada módulo
+- [x] Implementar proteção de rotas baseada em permissões
+- [x] Ocultar itens do menu sem permissão
+- [x] Adicionar mensagem de "Acesso negado" para rotas sem permissão
+- [ ] Testar sistema de permissões completo
+
+## Módulo de DRE (Demonstrativo de Resultados)
+
+### Backend e Cálculos
+- [x] Criar tabela dre no schema (se necessário)
+- [x] Implementar função de cálculo de receitas mensais
+- [x] Implementar função de cálculo de custos mensais
+- [x] Calcular Margem de Contribuição
+- [x] Calcular EBITDA
+- [x] Criar endpoint tRPC para obter DRE mensal
+- [x] Criar endpoint tRPC para obter DRE comparativo
+
+### Frontend
+- [x] Criar página de DRE (/dre)
+- [x] Adicionar DRE ao menu lateral
+- [x] Implementar seletor de período (mês/ano)
+- [x] Criar cards com indicadores principais
+- [x] Implementar tabela de DRE detalhada
+- [x] Adicionar gráfico de evolução mensal
+- [x] Adicionar gráfico de comparativo de receitas vs custos
+- [ ] Implementar exportação de DRE para Excel
+- [ ] Implementar exportação de DRE para PDF
+- [ ] Testar módulo de DRE completo
+
+## Testes Finais do Sistema Completo
+
+- [ ] Testar fluxo de autenticação (login/logout/registro)
+- [ ] Testar criação e seleção de empresas (tenants)
+- [ ] Testar Dashboard CEO com todos os gráficos
+- [ ] Testar módulo de Caixa (CRUD e exportação)
+- [ ] Testar módulo de Recebíveis (CRUD e exportação)
+- [ ] Testar módulo de Pagáveis (CRUD e exportação)
+- [ ] Testar todos os Cadastros (Companies, Products, Categories, etc)
+- [ ] Testar importação de planilhas Excel
+- [ ] Testar tutorial interativo
+- [ ] Testar página de Configurações (alterar dados e senha)
+- [ ] Testar sistema de permissões
+- [ ] Testar módulo de DRE
+- [ ] Verificar responsividade em mobile
+- [ ] Verificar todos os cálculos financeiros
+
+## Melhorias de UX
+
+- [x] Admin deve pular tela de seleção de empresa e ir direto para Dashboard
+- [ ] Criar empresa automaticamente para admin no primeiro acesso
+- [x] Redirecionar admin automaticamente após login

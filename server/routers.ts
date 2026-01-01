@@ -93,6 +93,60 @@ export const appRouter = router({
         }
         return { success: true };
       }),
+
+    listAll: protectedProcedure.query(async ({ ctx }) => {
+      // Apenas admins podem listar todos os usuários
+      if (ctx.user.role !== 'admin') {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Acesso negado",
+        });
+      }
+      return db.getAllUsers();
+    }),
+
+    updatePermissions: protectedProcedure
+      .input(z.object({
+        userId: z.number(),
+        permissions: z.array(z.string()),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        // Apenas admins podem atualizar permissões
+        if (ctx.user.role !== 'admin') {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Acesso negado",
+          });
+        }
+        await db.updateUserPermissions(input.userId, input.permissions);
+        return { success: true };
+      }),
+
+    getPermissions: protectedProcedure.query(async ({ ctx }) => {
+      const permissions = await db.getUserPermissions(ctx.user.id);
+      return permissions || [];
+    }),
+  }),
+
+  dre: router({
+    getMonthly: protectedProcedure
+      .input(z.object({
+        tenantId: z.number(),
+        month: z.number().min(1).max(12),
+        year: z.number(),
+      }))
+      .query(async ({ input }) => {
+        return db.getDREData(input.tenantId, input.month, input.year);
+      }),
+
+    getComparative: protectedProcedure
+      .input(z.object({
+        tenantId: z.number(),
+        year: z.number(),
+      }))
+      .query(async ({ input }) => {
+        return db.getDREComparative(input.tenantId, input.year);
+      }),
   }),
 
   tenant: router({

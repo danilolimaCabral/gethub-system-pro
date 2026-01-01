@@ -64,11 +64,15 @@ export default function Home() {
     if (!isAuthenticated && !loading) {
       setLocation("/login");
     }
+    // Admin vai direto para dashboard, sem precisar selecionar empresa
+    if (isAuthenticated && !loading && user?.role === 'admin') {
+      setLocation("/dashboard");
+    }
     // Se autenticado e não tem tenants, redirecionar direto para dashboard
     if (isAuthenticated && !loading && tenants && tenants.length === 0) {
       setLocation("/dashboard");
     }
-  }, [isAuthenticated, loading, tenants, setLocation]);
+  }, [isAuthenticated, loading, user, tenants, setLocation]);
 
   if (loading) {
     return (

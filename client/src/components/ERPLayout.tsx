@@ -1,4 +1,5 @@
 import { useAuth } from "@/_core/hooks/useAuth";
+import { usePermissions } from "@/hooks/usePermissions";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
@@ -19,6 +20,8 @@ import {
   X,
   ArrowLeft,
   Upload,
+  Shield,
+  BarChart3,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
@@ -40,6 +43,7 @@ const navItems: NavItemWithTour[] = [
   { title: "Caixa", href: "/cash-flow", icon: Wallet, dataTour: "cashflow" },
   { title: "Recebíveis", href: "/receivables", icon: TrendingUp, dataTour: "receivables" },
   { title: "Pagáveis", href: "/payables", icon: TrendingDown, dataTour: "payables" },
+  { title: "DRE", href: "/dre", icon: BarChart3 },
   { title: "Estoque", href: "/stock", icon: Package },
   { title: "Importar Planilha", href: "/import", icon: Upload, dataTour: "import" },
 ];
@@ -59,6 +63,7 @@ interface ERPLayoutProps {
 
 export default function ERPLayout({ children }: ERPLayoutProps) {
   const { user, logout } = useAuth();
+  const { hasPermission } = usePermissions();
   const [location] = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -131,7 +136,7 @@ export default function ERPLayout({ children }: ERPLayoutProps) {
               Principal
             </h3>
             <nav className="space-y-1">
-              {navItems.map((item) => (
+              {navItems.filter(item => !item.dataTour || hasPermission(item.dataTour)).map((item) => (
                 <NavLink key={item.href} item={item} />
               ))}
             </nav>
@@ -144,7 +149,7 @@ export default function ERPLayout({ children }: ERPLayoutProps) {
               Cadastros
             </h3>
             <nav className="space-y-1" data-tour="cadastros">
-              {cadastrosItems.map((item) => (
+              {cadastrosItems.filter(item => !item.dataTour || hasPermission(item.dataTour)).map((item) => (
                 <NavLink key={item.href} item={item} />
               ))}
             </nav>
@@ -157,6 +162,9 @@ export default function ERPLayout({ children }: ERPLayoutProps) {
               Sistema
             </h3>
             <nav className="space-y-1">
+              {user?.role === 'admin' && (
+                <NavLink item={{ title: "Usuários", href: "/users", icon: Shield }} />
+              )}
               <NavLink item={{ title: "Configurações", href: "/settings", icon: Settings }} />
             </nav>
           </div>

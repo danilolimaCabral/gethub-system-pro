@@ -1,0 +1,9 @@
+{
+  "query": "UPDATE users SET permissions = JSON_ARRAY('dashboard', 'cashflow', 'receivables', 'payables', 'stock', 'companies', 'products', 'customers', 'suppliers', 'categories', 'marketplaces', 'settings') WHERE permissions IS NULL;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2q7zpKXyHy6d6eT.3361d9972713 --database PRmoFLsahKdkvgxbSxCWaH --execute UPDATE users SET permissions = JSON_ARRAY('dashboard', 'cashflow', 'receivables', 'payables', 'stock', 'companies', 'products', 'customers', 'suppliers', 'categories', 'marketplaces', 'settings') WHERE permissions IS NULL;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 412
+}
